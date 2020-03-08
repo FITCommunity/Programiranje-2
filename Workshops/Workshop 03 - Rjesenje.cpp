@@ -38,7 +38,7 @@ public:
 		strncpy_s(_ime, uposlenik._ime, _TRUNCATE);
 		strncpy_s(_prezime, uposlenik._prezime, _TRUNCATE);
 
-		delete[] _radnoMjesto;
+		//delete[] _radnoMjesto;
 		_radnoMjesto = AlocirajNizKaraktera(uposlenik._radnoMjesto);
 	}
 
@@ -109,7 +109,7 @@ public:
 
 	Aktivnost& operator=(const Aktivnost& aktivnost)
 	{
-		if (!CompareTo(aktivnost))
+		if (this != &aktivnost)
 		{
 			delete[] _naziv;
 			_naziv = AlocirajNizKaraktera(aktivnost._naziv);
@@ -132,7 +132,6 @@ public:
 	}
 	~Aktivnost()
 	{
-		cout << _naziv << endl;
 		delete[] _naziv; _naziv = nullptr;
 		delete _trajanje; _trajanje = nullptr;
 		for (int i = 0; i < 5; i++)
@@ -144,7 +143,7 @@ public:
 
 
 	const char* GetNaziv() const { return _naziv; }
-	const Uposlenik* GetUposlenike() const { return *_uposlenici; }
+	Uposlenik *const *GetUposlenike() const { return _uposlenici; }
 	int GetTrajanje() const { return *_trajanje; }
 	void SetZavrsena(bool status) { _zavrsena = status; }
 	bool GetZavrsena() const { return _zavrsena; }
@@ -221,11 +220,13 @@ struct UposlenikAngazovanja
 	int brojAngazovanja = 0;
 	int ukupnaDuzinaAktivnosti = 0;
 	UposlenikAngazovanja() :
-		uposlenik(nullptr)
+		uposlenik(new Uposlenik())
 	{}
 	UposlenikAngazovanja(const Uposlenik u, int angazovanja = 0, int duzina = 0) :
-		uposlenik(new Uposlenik(u)), brojAngazovanja(angazovanja), ukupnaDuzinaAktivnosti(duzina)
-	{}
+		brojAngazovanja(angazovanja), ukupnaDuzinaAktivnosti(duzina)
+	{
+		uposlenik = new Uposlenik(u);
+	}
 };
 
 class Projekat {
@@ -259,9 +260,28 @@ public:
 			_aktivnosti[i] = projekat._aktivnosti[i];
 	}
 
+	Projekat& operator=(const Projekat& projekat)
+	{
+		if (this != &projekat)
+		{
+			delete[] _naziv;
+			_naziv = AlocirajNizKaraktera(projekat._naziv);
+			delete[] _oblast;
+			_oblast = AlocirajNizKaraktera(projekat._oblast);
+
+			_brojAktivnosti = projekat._brojAktivnosti;
+			delete[] _aktivnosti;
+			_aktivnosti = new Aktivnost[_brojAktivnosti];
+			for (int i = 0; i < _brojAktivnosti; i++)
+				_aktivnosti[i] = projekat._aktivnosti[i];
+		}
+
+		return *this;
+	}
+
 	~Projekat()
 	{
-		cout << _naziv << endl;
+		
 		delete[] _naziv; _naziv = nullptr;
 		delete[] _oblast; _oblast = nullptr;
 		delete[] _aktivnosti; _aktivnosti = nullptr;
@@ -311,7 +331,7 @@ public:
 
 	//Funkciju koja treba da vrati sve uposlenike angazovane na odredjenoj aktivnosti. 
 	//Ulazni parametar je naziv aktivnosti.
-	const Uposlenik* GetUposlenikeNaAktivnosti(const char* naziv)
+	const Uposlenik* const *GetUposlenikeNaAktivnosti(const char* naziv)
 	{
 		for (int i = 0; i < _brojAktivnosti; i++)
 			if (strcmp(_aktivnosti[i].GetNaziv(), naziv) == 0)
@@ -347,28 +367,31 @@ public:
 		int brojAngazovanih = 0;
 		for (int i = 0; i < _brojAktivnosti; i++)
 		{
-			const Uposlenik* angazovani = _aktivnosti[i].GetUposlenike();
+			const Uposlenik* const* angazovani = _aktivnosti[i].GetUposlenike();
 			for (int j = 0; j < 5; j++)
 			{
-				bool nijeAngazovan = true;
-				for (int k = 0; k < brojAngazovanih; k++)
+				if (angazovani[j])
 				{
-					if (niz[k].uposlenik->GetSifra() == angazovani[j].GetSifra())
+					bool nijeAngazovan = true;
+					for (int k = 0; k < brojAngazovanih; k++)
 					{
-						niz[k].brojAngazovanja++;
-						nijeAngazovan = false;
-						break;
+						if (niz[k].uposlenik->GetSifra() == angazovani[j]->GetSifra())
+						{
+							niz[k].brojAngazovanja++;
+							nijeAngazovan = false;
+							break;
+						}
 					}
-				}
 
-				if (nijeAngazovan)
-				{
-					UposlenikAngazovanja* temp = new UposlenikAngazovanja[brojAngazovanih + 1];
-					for (int i = 0; i < brojAngazovanih; i++)
-						temp[i] = niz[i];
-					temp[brojAngazovanih] = UposlenikAngazovanja(angazovani[j], 1);
-					niz = temp;
-					brojAngazovanih++;
+					if (nijeAngazovan)
+					{
+						UposlenikAngazovanja* temp = new UposlenikAngazovanja[brojAngazovanih + 1]{};
+						for (int l = 0; l < brojAngazovanih; l++)
+							temp[l] = niz[l];
+						temp[brojAngazovanih] = UposlenikAngazovanja(*angazovani[j], 1);
+						niz = temp;
+						brojAngazovanih++;
+					}
 				}
 			}
 		}
@@ -380,14 +403,15 @@ public:
 			}
 
 		Uposlenik** topN = new Uposlenik*[top];
-		topN = nullptr;
+
 		if (niz)
 		{
 			for (int i = 0; i < top && i < brojAngazovanih; i++)
 				topN[i] = new Uposlenik(*niz[i].uposlenik);
+			return topN;
 		}
 
-		return topN;
+		return nullptr;
 	}
 
 	//Funkciju koja pronalazi uposlenika sa najvecim brojem angazmana na aktivnostima.
@@ -431,29 +455,32 @@ Uposlenik* NajuspjesnijiUposlenik(Projekat* projekti, int brojProjekata)
 		{
 			if (aktivnosti[j].GetZavrsena())
 			{
-				const Uposlenik* angazovani = projekti[i].GetAktivnosti()[j].GetUposlenike();
+				const Uposlenik* const *angazovani = aktivnosti[j].GetUposlenike();
 				for (int k = 0; k < 5; k++)
 				{
-					bool nijeAngazovan = true;
-					for (int l = 0; l < brojAngazovanih; l++)
+					if (angazovani[k])
 					{
-						if (niz[l].uposlenik->GetSifra() == angazovani[k].GetSifra())
+						bool nijeAngazovan = true;
+						for (int l = 0; l < brojAngazovanih; l++)
 						{
-							niz[l].brojAngazovanja++;
-							niz[l].ukupnaDuzinaAktivnosti += aktivnosti[j].GetTrajanje();
-							nijeAngazovan = false;
-							break;
+							if (niz[l].uposlenik->GetSifra() == angazovani[k]->GetSifra())
+							{
+								niz[l].brojAngazovanja++;
+								niz[l].ukupnaDuzinaAktivnosti += aktivnosti[j].GetTrajanje();
+								nijeAngazovan = false;
+								break;
+							}
 						}
-					}
 
-					if (nijeAngazovan)
-					{
-						UposlenikAngazovanja* temp = new UposlenikAngazovanja[brojAngazovanih + 1];
-						for (int i = 0; i < brojAngazovanih; i++)
-							temp[i] = niz[i];
-						temp[brojAngazovanih] = UposlenikAngazovanja(angazovani[k], 1, aktivnosti[j].GetTrajanje());
-						niz = temp;
-						brojAngazovanih++;
+						if (nijeAngazovan)
+						{
+							UposlenikAngazovanja* temp = new UposlenikAngazovanja[brojAngazovanih + 1];
+							for (int m = 0; m < brojAngazovanih; m++)
+								temp[m] = niz[m];
+							temp[brojAngazovanih] = UposlenikAngazovanja(*angazovani[k], 1, aktivnosti[j].GetTrajanje());
+							niz = temp;
+							brojAngazovanih++;
+						}
 					}
 				}
 			}
@@ -492,41 +519,57 @@ int main()
 	Uposlenik u8("Ime8", "Prezime8", "RadnoMjesto8");
 
 
-	Uposlenik u9(u1);
-
-	u1.Info();
-	u9.Info();
-
 	Aktivnost a1("Aktivnost 1", 12);
 	Aktivnost a2("Aktivnost 2", 12);
-	a1.Info();
-	cout << endl;
-	cout << endl;
+	Aktivnost a3("Aktivnost 3", 10);
+	Aktivnost a4("Aktivnost 4", 5);
+	Aktivnost a5("Aktivnost 5", 7);
+
+	
 	a1.DodajUposlenika(u1);
 	a1.DodajUposlenika(u2);
 	a1.DodajUposlenika(u3);
-	Aktivnost a3(a1);
-	a1.Info();
-	cout << endl;
-	cout << endl;
-	cout << a1.UkloniUposlenika(1) << endl;	
-	cout << endl;
-	a1.Info();
-	cout << endl;
-	a1.DodajUposlenika(u1);
-	a1.Info();
-	cout << endl;
-	a1.UkloniUposlenike();
-	cout << endl;
-	a1.Info();
 
-	Projekat p1("Projekat1", "Oblast1", 12);
-	p1.DodajAktivnost(a1);
-	p1.DodajAktivnost(a1);
-	p1.Info();
-	cout << endl;
-	cout << endl;
+	a2.DodajUposlenika(u1);
+	a2.DodajUposlenika(u4);
+	a2.DodajUposlenika(u5);
+
+	a3.DodajUposlenika(u1);
+	a3.DodajUposlenika(u2);
+	a3.DodajUposlenika(u6);
+
+	a4.DodajUposlenika(u2);
+	a4.DodajUposlenika(u3);
+	a4.DodajUposlenika(u7);
+
+	a5.DodajUposlenika(u3);
+	a5.DodajUposlenika(u8);
+	
+	Projekat projekti[3]{ Projekat("Projekat1", "Oblast1", 12) };
+	
+	projekti[0].DodajAktivnost(a1);
+	projekti[0].DodajAktivnost(a1);
+	projekti[0].DodajAktivnost(a2);
+	projekti[0].DodajAktivnost(a3);
+	projekti[0].DodajAktivnost(a4);
+	projekti[0].DodajAktivnost(a5);
+
+	
+	
+	Uposlenik** temp1 = projekti[0].GetTop1Angazovan();
+	cout << endl << endl << temp1[0]->GetIme() << endl << endl;
+	Uposlenik** temp2 = projekti[0].GetTop3Angazovani();
+	for (int i = 0; i < 3; i++)
+		cout << temp2[i]->GetIme() << endl;
+	
+
+	projekti[1] = projekti[0];
+	projekti[2] = projekti[0];
+
+	Uposlenik* temp3 = NajuspjesnijiUposlenik(projekti, 1);
+	cout << endl << temp3->GetIme() << endl;
+
+
 	system("pause");
-
 	return 0;
 }

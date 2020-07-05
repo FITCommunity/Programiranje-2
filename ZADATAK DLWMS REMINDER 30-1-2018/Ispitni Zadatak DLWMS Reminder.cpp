@@ -312,7 +312,7 @@ public:
 };
 
 
-mutex mudegz;
+mutex mutegz;
 
 class DLWMSReminder
 {
@@ -334,7 +334,7 @@ class DLWMSReminder
 
 						while (!(temp==_reminiderList[i].GetDogadjaji()[j].GetDatumOdrzavanja()))/*&& !_reminiderList[i].GetDogadjaji()[j].GetObaveze()->GetElement2(k)*/
 						{
-							mudegz.lock();
+							mutegz.lock();
 
 
 							cout << "Postovani " << _reminiderList[i].GetImePrezime()<<"," << endl;
@@ -344,7 +344,7 @@ class DLWMSReminder
 							_reminiderList[i].GetDogadjaji()[j].IspisPreostalihObaveza();
 							cout << "Predlazemo Vam da ispunite i ostale planirane obaveze." << endl;
 							cout << "FIT Reminder" << crt;
-							mudegz.unlock();
+							mutegz.unlock();
 
 
 							brojac++;
@@ -353,7 +353,7 @@ class DLWMSReminder
 
 
 					}else {
-						mudegz.lock();
+						mutegz.lock();
 
 
 						cout << "Poštovani " << _reminiderList[i].GetImePrezime() << "," << endl;
@@ -365,7 +365,7 @@ class DLWMSReminder
 						cout << "FIT Reminder" << crt;
 
 
-						mudegz.unlock();
+						mutegz.unlock();
 						brojac++;
 					}
 

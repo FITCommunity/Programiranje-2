@@ -208,7 +208,7 @@ class Dogadjaj
 	bool _rekurzivnaNotifikacija; //ako je vrijednost true onda se korisnik notificira svaki dan do _datumaOdrzavanja dogadjaja, a pocevsi prije dogadjaja za _brojDanaZaNotifikaciju
 	bool ValidanFormat(string obaveza)
 	{
-		return !regex_search(obaveza, regex("(role|ustipak|mudegz|adil)"));
+		return !regex_search(obaveza, regex("(ustipak|mutekz|rat)"));
 	}
 public:
 	Dogadjaj(Datum datumOdrzavanja, const char* naziv, int brojDana = 1,

@@ -97,8 +97,14 @@ public:
 
     void AddElement(T1 el1, T2 el2, int lokacija)
     {
+        for (int i = _trenutno; i > lokacija; i--)
+        {
+            *_elementi1[i] = *_elementi1[i - 1];
+            *_elementi2[i] = *_elementi2[i - 1];
+        }
+
         _elementi1[lokacija] = new T1(el1);
-        _elementi2[lokacija] = new T2(el2);
+        _elementi2[lokacija] = new T1(el2);
         _trenutno++;
     }
 
@@ -184,7 +190,7 @@ int GetRazliku(Datum& prvi, Datum& drugi)
 
 class Tehnika {
     char* _naziv;
-    //int se odnosi na ocjenu u opsegu od 1 – 5, a Datum na datum kada je ocijenjena odredjena tehnika 
+    //int se odnosi na ocjenu u opsegu od 1 â€“ 5, a Datum na datum kada je ocijenjena odredjena tehnika 
     Kolekcija<int, Datum, brojTehnika>* _ocjene;
 public:
     Tehnika(const char* naziv) {

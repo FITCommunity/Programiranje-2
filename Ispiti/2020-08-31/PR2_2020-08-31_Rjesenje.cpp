@@ -25,7 +25,7 @@ const char* PORUKA = "\n--------------------------------------------------------
 
 const char* crt = "\n-------------------------------------------\n";
 enum Predmet { UIT, PRI, PRII, PRIII, RSI, RSII };
-const char* ispisPredmeta[] = { "UIT", "PRI", "PRII", "PRIII"," RSI", "RSII"};
+const char* ispisPredmeta[] = { "UIT", "PRI", "PRII", "PRIII"," RSI", "RSII" };
 enum Dupliranje { SA_DUPLIKATIMA, BEZ_DUPLIKATA };
 const char* NIJE_VALIDNA = "<VRIJEDNOST_NIJE_VALIDNA>";
 
@@ -39,7 +39,10 @@ char* GetNizKaraktera(const char* sadrzaj, bool dealociraj = false) {
         delete[]sadrzaj;
     return temp;
 }
-
+bool ValidirajLozinku(string lozinka)
+{
+    return regex_match(lozinka, regex("(?=.{6,7})[*_/][0-9][a-z][\\s]?[A-Z][0-9][a-z]"));
+}
 template<class T1, class T2>
 class Kolekcija {
     T1* _elementi1;
@@ -112,8 +115,8 @@ public:
         temp1[*_trenutno] = el1;
         temp2[*_trenutno] = el2;
         (*_trenutno)++;
-        _elementi1 = temp1;temp1=nullptr;
-        _elementi2 = temp2;temp2=nullptr;
+        _elementi1 = temp1; temp1 = nullptr;
+        _elementi2 = temp2; temp2 = nullptr;
     }
 
 
@@ -221,7 +224,7 @@ public:
     }
     char* GetSadrzaj() { return _sadrzaj; }
     Kolekcija<int, Datum*>& GetOcjene() { return _ocjeneRjesenja; }
-   
+
     bool AddOcjena(int ocjena, Datum& datumOcjene)
     {
         int trenutno = _ocjeneRjesenja.getTrenutno();
@@ -297,7 +300,7 @@ public:
     }
 
     friend ostream& operator<< (ostream& COUT, const Ispit& obj) {
-        COUT <<"Predmet-> "<<ispisPredmeta[obj._predmet] << endl;
+        COUT << "Predmet-> " << ispisPredmeta[obj._predmet] << endl;
         COUT << ":: PITANJA ODGOVORI ::" << endl;
         for (int i = 0; i < obj._pitanjaOdgovori.getTrenutno(); i++)
         {
@@ -349,7 +352,7 @@ class Kandidat : public Korisnik {
     {
         m.lock();
         cout << "FROM: info@kursevi.ba\nTO: " << GetEmail() << "\n Postovani " << GetImePrezime() << ", evidentirana vam je ocjena->   za odgovor na pitanje-> " << sadrzajPitanja;
-        cout << ".Dosadasnji uspjeh za pitanje-> " << sadrzajPitanja << " iznosi-> " << prosjekPitanja << ", a ukupni uspjeh na svim predmetima iznosi -> "<< ProsjekSvihOdgovora()<<endl;
+        cout << ".Dosadasnji uspjeh za pitanje-> " << sadrzajPitanja << " iznosi-> " << prosjekPitanja << ", a ukupni uspjeh na svim predmetima iznosi -> " << ProsjekSvihOdgovora() << endl;
         cout << "Pozdrav.\nEDUTeam.\n";
         m.unlock();
     }
@@ -370,7 +373,7 @@ public:
     }
     vector<Ispit*>& GetPolozeniPredmeti() { return _polozeniPredmeti; }
     friend ostream& operator<< (ostream& COUT, Kandidat& obj) {
-        COUT <<"Kandidat-> "<< obj.GetImePrezime() << "   mail -> " << obj.GetEmail() << "   lozinka-> " << obj.GetLozinka() << endl;
+        COUT << "Kandidat-> " << obj.GetImePrezime() << "   mail -> " << obj.GetEmail() << "   lozinka-> " << obj.GetLozinka() << endl;
         COUT << "::: POLOZENI PREDMETI :::" << endl;
         for (int i = 0; i < obj._polozeniPredmeti.size(); i++)
             COUT << *obj._polozeniPredmeti[i];
@@ -387,11 +390,11 @@ public:
         return false;
     }
 
-    bool AddPitanje(Predmet predmet,Pitanje& pitanje,string napomena="---")
+    bool AddPitanje(Predmet predmet, Pitanje& pitanje, string napomena = "---")
     {
         for (int i = 0; i < _polozeniPredmeti.size(); i++)
         {
-            if(predmet>_polozeniPredmeti[i]->GetPredmet() && (_polozeniPredmeti[i]->GetPitanjaOdgovore().getTrenutno()<3 || _polozeniPredmeti[i]->GetProsjekSvihPitanja()<3.5))
+            if (predmet > _polozeniPredmeti[i]->GetPredmet() && (_polozeniPredmeti[i]->GetPitanjaOdgovore().getTrenutno() < 3 || _polozeniPredmeti[i]->GetProsjekSvihPitanja() < 3.5))
                 return false;
 
             if (PostojeLiIsti(predmet, pitanje))
@@ -402,7 +405,7 @@ public:
             float prosjekPitanja = pitanje.GetProsjekPitanja();
             thread t1(&Kandidat::PosaljiEmail, this, sadrzaj, prosjekPitanja);
             t1.join();
-           
+
             return true;
         }
 
@@ -453,13 +456,12 @@ public:
 
 void main() {
 
-   /* cout << PORUKA;
-    cin.get();
-
-    cout << GetOdgovorNaPrvoPitanje() << endl;
-    cin.get();
-    cout << GetOdgovorNaDrugoPitanje() << endl;
-    cin.get();*/
+    /* cout << PORUKA;
+     cin.get();
+     cout << GetOdgovorNaPrvoPitanje() << endl;
+     cin.get();
+     cout << GetOdgovorNaDrugoPitanje() << endl;
+     cin.get();*/
 
     Datum   datum19062020(19, 6, 2020),
         datum20062020(20, 6, 2020),
@@ -524,18 +526,18 @@ void main() {
     // // ukoliko pitanje nema niti jednu ocjenu prosjecna treba biti 0
     cout << sortiranjeNiza << endl;
 
-    //if (ValidirajLozinku("*2gT2x"))
-    //    cout << "Lozinka validna" << endl;
-    //if (ValidirajLozinku("*7aT2x"))
-    //    cout << "Lozinka validna" << endl;
-    //if (ValidirajLozinku("_6gU9z"))
-    //    cout << "Lozinka validna" << endl;
-    //if (ValidirajLozinku("*3aB1y"))
-    //    cout << "Lozinka validna" << endl;
-    //if (ValidirajLozinku("*1a T2l"))
-    //    cout << "Lozinka validna" << endl;
-    //if (!ValidirajLozinku("-1a T2l"))
-    //    cout << "Lozinka NIJE validna" << endl;
+    if (ValidirajLozinku("*2gT2x"))
+        cout << "Lozinka validna" << endl;
+    if (ValidirajLozinku("*7aT2x"))
+        cout << "Lozinka validna" << endl;
+    if (ValidirajLozinku("_6gU9z"))
+        cout << "Lozinka validna" << endl;
+    if (ValidirajLozinku("*3aB1y"))
+        cout << "Lozinka validna" << endl;
+    if (ValidirajLozinku("*1a T2l"))
+        cout << "Lozinka validna" << endl;
+    if (!ValidirajLozinku("-1a T2l"))
+        cout << "Lozinka NIJE validna" << endl;
 
     ///*
     //za autentifikaciju svaki korisnik mora posjedovati lozinku koja sadrzi 6 ili 7 znakova postujuci sljedeca pravila:
@@ -568,7 +570,7 @@ void main() {
     //ukoliko je potrebno, doraditi klase da nacin da omoguce izvrsenje naredne linije koda
     Kandidat* jasminPolaznik = dynamic_cast<Kandidat*>(jasmin);
 
-    
+
     if (jasminPolaznik != nullptr) {
         if (jasminPolaznik->AddPitanje(PRI, dinamickaMemorija, "nedostaje operator delete"))
             cout << "Pitanje uspjesno dodano!" << crt;
@@ -588,7 +590,7 @@ void main() {
         //ispisuje sve dostupne podatke o kandidatu
         cout << *jasminPolaznik << crt;
 
-       // vraca broj ponavljanja odredjene rijeci unutar napomena nastalih tokom polaganja ispita.
+        // vraca broj ponavljanja odredjene rijeci unutar napomena nastalih tokom polaganja ispita.
         int brojPonavljanja = (*jasminPolaznik)("nedostaje");
         cout << "Rijec nedostaje se ponavlja " << brojPonavljanja << " puta." << endl;
 

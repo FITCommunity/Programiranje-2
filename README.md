@@ -7,3 +7,4 @@
 
 * [Enis Mulić](https://github.com/PancakeAlchemist)  
 * [Denis Tojaga](https://github.com/Denis-Tojaga)
+* [Ermin Maksumić](https://github.com/ErminMaksumic)

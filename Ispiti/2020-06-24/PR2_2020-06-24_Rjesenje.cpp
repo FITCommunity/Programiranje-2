@@ -175,7 +175,7 @@ public:
 
 class Predmet {
     char* _naziv;
-    //int se odnosi na ocjenu u opsegu od 1 – 5, a datum na momenat postizanja ocjene
+    //int se odnosi na ocjenu u opsegu od 1 ï¿½ 5, a datum na momenat postizanja ocjene
     Kolekcija<int, Datum> _ocjene;
 public:
     Predmet(const char* naziv = "", int ocjena = 0, Datum datum = Datum()) {
@@ -452,12 +452,8 @@ public:
     {
         Uspjeh* u = nullptr;
         for (int i = 0; i < _uspjeh.size(); i++)
-        {
             if (_uspjeh[i].GetERazred() == razred)
-            {
                 u = &_uspjeh[i];
-            }
-        }
         return u;
     }
 
@@ -592,7 +588,11 @@ void main() {
     cout << crt;
     cout << jasminUspjeh << crt;
 
+<<<<<<< HEAD
     Uspjeh* uspjeh_Irazred = jasmin[PRVI];//vraca uspjeh kandidata ostvaren u prvom razredu
+=======
+    Uspjeh* uspjeh_Irazred = jasmin.[PRVI];//vraca uspjeh kandidata ostvaren u prvom razredu
+>>>>>>> 7e017ad8b51e271114403e20eeee47b19db265ea
     if (uspjeh_Irazred != nullptr)
         cout << *uspjeh_Irazred << crt;
 

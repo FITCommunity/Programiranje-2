@@ -210,7 +210,7 @@ public:
     {
         float prosjek = 0;
         for (int i = 0; i < _ocjene.getTrenutno(); i++)
-            prosjek += _ocjene.getTrenutno();
+            prosjek += _ocjene.getElement1(i);
         return prosjek / _ocjene.getTrenutno();
     }
     friend ostream& operator<<(ostream& COUT, Predmet& obj)

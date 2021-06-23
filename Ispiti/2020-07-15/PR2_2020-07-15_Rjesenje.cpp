@@ -96,8 +96,12 @@ public:
         _trenutno++;
     }
 
-    void AddElement(T1 el1, T2 el2, int lokacija)
-    {
+    void AddElement(T1 el1, T2 el2, int lokacija) {
+        if (_trenutno >= max) throw exception("Prekoracenje opsega!");
+        for (int i = _trenutno; i > lokacija; i--) {
+            _elementi1[i] = _elementi1[i - 1];
+            _elementi2[i] = _elementi2[i - 1];
+        }
         _elementi1[lokacija] = new T1(el1);
         _elementi2[lokacija] = new T2(el2);
         _trenutno++;

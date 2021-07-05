@@ -3,6 +3,7 @@
 #include<string>
 #include<thread>
 #include<mutex>
+#include<regex>
 using namespace std;
 
 
@@ -90,13 +91,17 @@ public:
         if (_trenutno >= max)
             throw exception("Dosegli ste maksimum kolekcije!\n");
         //ako nema pokazivaca onda ide samo _elementi1[_trenutno]=el1 jer je rijec o statickom nizu, u suprotnom se mora napraviti alokacija memorije za taj novi clan tj. el1
-        _elementi1[_trenutno] =new T1(el1);
+        _elementi1[_trenutno] = new T1(el1);
         _elementi2[_trenutno] = new T2(el2);
         _trenutno++;
     }
 
-    void AddElement(T1 el1, T2 el2, int lokacija)
-    {
+    void AddElement(T1 el1, T2 el2, int lokacija) {
+        if (_trenutno >= max) throw exception("Prekoracenje opsega!");
+        for (int i = _trenutno; i > lokacija; i--) {
+            _elementi1[i] = _elementi1[i - 1];
+            _elementi2[i] = _elementi2[i - 1];
+        }
         _elementi1[lokacija] = new T1(el1);
         _elementi2[lokacija] = new T2(el2);
         _trenutno++;
@@ -105,10 +110,10 @@ public:
 
     void RemoveAt(int lokacija)
     {
-        for (int i = lokacija; i < _trenutno-1; i++)
+        for (int i = lokacija; i < _trenutno - 1; i++)
         {
-            *_elementi1[i] =*_elementi1[i + 1];
-            *_elementi2[i] =*_elementi2[i + 1];
+            *_elementi1[i] = *_elementi1[i + 1];
+            *_elementi2[i] = *_elementi2[i + 1];
         }
         _trenutno--;
     }
@@ -171,7 +176,7 @@ public:
     }
 
     friend ostream& operator<< (ostream& COUT, const Datum& obj) {
-        COUT << *obj._dan << "." << *obj._mjesec << "." << *obj._godina<<endl;
+        COUT << *obj._dan << "." << *obj._mjesec << "." << *obj._godina << endl;
         return COUT;
     }
 };
@@ -214,7 +219,7 @@ public:
     Kolekcija<int, Datum, brojTehnika>& GetOcjene() { return *_ocjene; }
 
 
-   
+
     bool AddOcjena(int ocjena, Datum& datumOcjene)
     {
         //spremimo broj ocjena u jedan int trenutno
@@ -249,7 +254,7 @@ public:
         COUT << ":: OCJENE TEHNIKE :: " << endl;
         for (int i = 0; i < obj._ocjene->getTrenutno(); i++)
             COUT << "Ocjena-> " << obj._ocjene->getElement1(i) << "     datum ocjene-> " << obj._ocjene->getElement2(i) << endl;
-        COUT << "Prosjek za tehniku je-> " <<obj.GetProsjekTehnike() << endl;
+        COUT << "Prosjek za tehniku je-> " << obj.GetProsjekTehnike() << endl;
         return COUT;
     }
 };
@@ -289,13 +294,17 @@ public:
     }
 
     friend ostream& operator<< (ostream& COUT, const Polaganje& obj) {
-        COUT <<"Pojas-> "<<ispisPojaseva[obj._pojas] << endl;
+        COUT << "Pojas-> " << ispisPojaseva[obj._pojas] << endl;
         COUT << "::: POLOZENE TEHNIKE ZA POJAS ::: " << endl;
         for (size_t i = 0; i < obj._polozeneTehnike.size(); i++)
             COUT << *obj._polozeneTehnike[i];
         return COUT;
     }
 };
+
+bool ValidirajLozinku(string text) {
+    return regex_search(text, regex("(?=.{7,})(?=.*[A-Z]{1,})(?=.*[a-z]{1,})(?=.*\\d{1,})(?=.*\\W{1,})"));
+}
 
 class Korisnik {
     char* _imePrezime;
@@ -306,7 +315,7 @@ public:
     {
         _imePrezime = GetNizKaraktera(imePrezime);
         _emailAdresa = emailAdresa;
-       // _lozinka = ValidirajLozinku(lozinka) ? lozinka : NIJE_VALIDNA;
+        _lozinka = ValidirajLozinku(lozinka) ? lozinka : NIJE_VALIDNA;
     }
     Korisnik(const Korisnik& original) : _imePrezime(GetNizKaraktera(original._imePrezime)), _emailAdresa(original._emailAdresa), _lozinka(original._lozinka) {}
     Korisnik& operator=(const Korisnik& drugi)
@@ -334,7 +343,7 @@ public:
 
 mutex mjuteks;
 
-class KaratePolaznik : public Korisnik{
+class KaratePolaznik : public Korisnik {
     vector<Polaganje> _polozeniPojasevi;
     void PosaljiMail(Pojas pojas, Tehnika tehnika)
     {
@@ -353,7 +362,7 @@ class KaratePolaznik : public Korisnik{
 
 public:
     void info() {}
-    KaratePolaznik(const char* imePrezime, string emailAdresa, string lozinka): Korisnik(imePrezime,emailAdresa,lozinka) {
+    KaratePolaznik(const char* imePrezime, string emailAdresa, string lozinka) : Korisnik(imePrezime, emailAdresa, lozinka) {
     }
     KaratePolaznik(const KaratePolaznik& original) : Korisnik(original), _polozeniPojasevi(original._polozeniPojasevi) {}
     KaratePolaznik& operator=(const KaratePolaznik& drugi)
@@ -369,7 +378,7 @@ public:
         cout << crt << "DESTRUKTOR -> KaratePolaznik" << crt;
     }
     friend ostream& operator<< (ostream& COUT, KaratePolaznik& obj) {
-        COUT <<"Karate polaznik-> "<< obj.GetImePrezime() << "   email-> " << obj.GetEmail() << "   lozinka->  " << obj.GetLozinka() << endl;
+        COUT << "Karate polaznik-> " << obj.GetImePrezime() << "   email-> " << obj.GetEmail() << "   lozinka->  " << obj.GetLozinka() << endl;
         COUT << "::: POLOZENI POJASEVI ::: " << endl;
         for (size_t i = 0; i < obj._polozeniPojasevi.size(); i++)
             COUT << obj._polozeniPojasevi[i];
@@ -405,7 +414,7 @@ public:
         return false;
     }
 
-  
+
 
     bool AddTehniku(Pojas pojas, Tehnika& tehnika)
     {
@@ -423,7 +432,7 @@ public:
                 _polozeniPojasevi[i].GetTehnike().push_back(new Tehnika(tehnika));
                 //prvi parametar lokacija funkcije koja je zaduzena za slanje maila, drugi parametar na koji objekat se odnosi tj. na this jer se Polazniku salje mail
                 //naredni parametri su oni koji se traze u ispisu(ako se ne traze ne salje se nista)
-                thread saljemMail(&KaratePolaznik::PosaljiMail,this,pojas,tehnika);
+                thread saljemMail(&KaratePolaznik::PosaljiMail, this, pojas, tehnika);
                 //obavezno za svaki thread mora se join-at glavnom programu OBAVEZNO!
                 saljemMail.join();
                 return true;
@@ -452,13 +461,13 @@ const char* GetOdgovorNaDrugoPitanje() {
 }
 void main() {
 
-   /* cout << PORUKA;
-    cin.get();
+    /* cout << PORUKA;
+     cin.get();
 
-    cout << GetOdgovorNaPrvoPitanje() << endl;
-    cin.get();
-    cout << GetOdgovorNaDrugoPitanje() << endl;
-    cin.get();*/
+     cout << GetOdgovorNaPrvoPitanje() << endl;
+     cin.get();
+     cout << GetOdgovorNaDrugoPitanje() << endl;
+     cin.get();*/
 
     Datum   datum19062020(19, 6, 2020),
         datum20062020(20, 6, 2020),
@@ -478,7 +487,7 @@ void main() {
         dodati vise od maksimalnog broja elemenata*/
         kolekcija1.AddElement(11, 11);
     }
-    catch (exception & err) {
+    catch (exception& err) {
         cout << crt << "Greska -> " << err.what() << crt;
     }
     cout << kolekcija1 << crt;
@@ -560,16 +569,16 @@ void main() {
     //   ukoliko tehnika nema niti jednu ocjenu prosjecna treba biti 0*/
     cout << choku_zuki << endl;
 
-    //if (ValidirajLozinku("john4Do*e"))
-    //    cout << "OK" << crt;
-    //if (!ValidirajLozinku("john4Doe"))
-    //    cout << "Specijalni znak?" << crt;
-    //if (!ValidirajLozinku("jo*4Da"))
-    //    cout << "7 znakova?" << crt;
-    //if (!ValidirajLozinku("4jo-hnoe"))
-    //    cout << "Veliko slovo?" << crt;
-    //if (ValidirajLozinku("@john2Doe"))
-    //    cout << "OK" << crt;
+    if (ValidirajLozinku("john4Do*e"))
+        cout << "OK" << crt;
+    if (!ValidirajLozinku("john4Doe"))
+        cout << "Specijalni znak?" << crt;
+    if (!ValidirajLozinku("jo*4Da"))
+        cout << "7 znakova?" << crt;
+    if (!ValidirajLozinku("4jo-hnoe"))
+        cout << "Veliko slovo?" << crt;
+    if (ValidirajLozinku("@john2Doe"))
+        cout << "OK" << crt;
 
     ///*
     //za autentifikaciju svaki korisnik mora posjedovati lozinku koja sadrzi:

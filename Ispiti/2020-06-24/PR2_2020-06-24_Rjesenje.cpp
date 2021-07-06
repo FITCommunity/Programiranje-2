@@ -588,11 +588,7 @@ void main() {
     cout << crt;
     cout << jasminUspjeh << crt;
 
-<<<<<<< HEAD
     Uspjeh* uspjeh_Irazred = jasmin[PRVI];//vraca uspjeh kandidata ostvaren u prvom razredu
-=======
-    Uspjeh* uspjeh_Irazred = jasmin.[PRVI];//vraca uspjeh kandidata ostvaren u prvom razredu
->>>>>>> 7e017ad8b51e271114403e20eeee47b19db265ea
     if (uspjeh_Irazred != nullptr)
         cout << *uspjeh_Irazred << crt;
 

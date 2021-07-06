@@ -293,8 +293,8 @@ public:
     {
         for (int i = 0; i < _polozeniPojasevi.size(); i++)
         {
-            //ako je proslijedjeni pojas visi od prethodnog pojasa i ( taj prethodni pojas ima manje od tri tehnike ili prosjek tog pojasa je manji od 3.5) ne treba dodati 
-            if (pojas > _polozeniPojasevi[i].GetPojas() && (_polozeniPojasevi[i].GetTehnike().getTrenutno() < 3 || _polozeniPojasevi[i].GetProsjekPojasa() < 3.5))
+            //ako je proslijedjeni pojas visi od prethodnog pojasa i taj prethodni pojas nema nijednu tehniku i dodavanje tehnika kod kojih je prosjecna ocjena manja od 3.5 - ne treba dodati 
+            if (pojas > _polozeniPojasevi[i].GetPojas() && _polozeniPojasevi[i].GetTehnike().getTrenutno() < 1 && _polozeniPojasevi[i].GetProsjekPojasa() < 3.5)
                 return false;
 
             if (_polozeniPojasevi[i].GetPojas() == pojas)

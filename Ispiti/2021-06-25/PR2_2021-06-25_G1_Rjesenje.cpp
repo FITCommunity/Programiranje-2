@@ -205,6 +205,7 @@ public:
     }
     ~Predmet() {
         delete[] _naziv; _naziv = nullptr;
+        delete _ocjene; _ocjene = nullptr;
     }
     char* GetNaziv() { return _naziv; }
     Kolekcija<Datum*, int> GetOcjene() { return _ocjene; }

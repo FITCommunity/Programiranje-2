@@ -102,7 +102,7 @@ public:
         _trenutno++;
     }
     Kolekcija<int, int> operator()(int pocetak, int kraj) {
-        if (kraj > _trenutno)
+        if (kraj > _trenutno || pocetak < 0)
             throw exception("Opseg nije validan!");
         Kolekcija<int, int> nova;
         for (int i = pocetak; i <= kraj; i++)
@@ -205,7 +205,6 @@ public:
     }
     ~Predmet() {
         delete[] _naziv; _naziv = nullptr;
-        delete _ocjene; _ocjene = nullptr;
     }
     char* GetNaziv() { return _naziv; }
     Kolekcija<Datum*, int> GetOcjene() { return _ocjene; }
@@ -536,8 +535,8 @@ void main() {
 
     //vraca kolekciju predmeta koji sadrze najmanje jednu ocjenu evidentiranu u periodu izmedju proslijedjenih datuma
     //float se odnosi na prosjecan broj dana izmedju ostvarenih ocjena na predmetu
-   Kolekcija<Predmet, float> jasminUspjeh = jasmin(new Datum(18, 06, 2021), new  Datum(21, 06, 2021));
-   cout << jasminUspjeh << crt;
+    Kolekcija<Predmet, float> jasminUspjeh = jasmin(new Datum(18, 06, 2021), new  Datum(21, 06, 2021));
+    cout << jasminUspjeh << crt;
 
     cin.get();
     system("pause>0");

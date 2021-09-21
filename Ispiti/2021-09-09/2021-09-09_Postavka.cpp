@@ -37,11 +37,12 @@ class Kolekcija {
 public:
 	Kolekcija() { _trenutno = new int(0); }
 	~Kolekcija() {
-		delete _trenutno; _trenutno = nullptr;
+		
 		for (size_t i = 0; i < *_trenutno; i++) {
 			delete _elementi1[i]; _elementi1[i] = nullptr;
 			delete _elementi2[i]; _elementi2[i] = nullptr;
 		}
+		delete _trenutno; _trenutno = nullptr;
 	}
 
 	T1& getElement1(int lokacija)const { return *_elementi1[lokacija]; }

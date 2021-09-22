@@ -47,11 +47,9 @@ class Kolekcija {
     int _trenutno;
     bool _omoguciDupliranje;
     bool PostojiLiIsti(T1 el1, T2 el2) {
-        if (_trenutno == 0)
-            return false;
         for (int i = 0; i < _trenutno; i++)
         {
-            if (_omoguciDupliranje == false && (el1 == _elementi1[i] && el2 == _elementi2[i])) {
+            if (el1 == _elementi1[i] && el2 == _elementi2[i]) {
                 return true;
             }
         }
@@ -120,7 +118,7 @@ public:
         delete[]_elementi2; _elementi2 = nullptr;
     }
     void AddElement(T1 el1, T2 el2) {
-        if (PostojiLiIsti(el1, el2))
+        if (!_omoguciDupliranje && PostojiLiIsti(el1, el2))
             throw exception("Nije moguce dodavanje duplih elemenata!");
         T1* temp1 = new T1[_trenutno + 1];
         T2* temp2 = new T2[_trenutno + 1];
@@ -180,14 +178,12 @@ public:
     bool operator!=(Datum obj) {
         return !(obj == *this);
     }
-    int ToDays() {
+    int ToDays() const {
         return *_dan + *_mjesec * 30 + *_godina * 365;
     }
-    bool ProslijedjeniDatumStariji(Datum obj) {
-        if (*_godina >= *obj._godina && *_mjesec >= *obj._mjesec && *_dan > *obj._dan) {
-            return true;
-        }
-        return false;
+    bool operator>(const Datum &drugi)
+    {
+        return this->ToDays() > drugi.ToDays();
     }
     ~Datum() {
         delete _dan; _dan = nullptr;
@@ -407,7 +403,9 @@ public:
             {
                 for (int k = 0; k < _uspjeh[i].GetPredmeti().getElement1(j)->GetOcjene().getTrenutno(); k++)
                 {
-                    if (_uspjeh[i].GetPredmeti().getElement1(j)->GetOcjene().getElement1(k)->ProslijedjeniDatumStariji(*prvi) && !(_uspjeh[i].GetPredmeti().getElement1(j)->GetOcjene().getElement1(k)->ProslijedjeniDatumStariji(*drugi))) {
+                    auto element = _uspjeh[i].GetPredmeti().getElement1(j)->GetOcjene().getElement1(k);
+                    if (element > prvi && drugi > element)
+                    {
                         temp.AddElement(*_uspjeh[i].GetPredmeti().getElement1(j), _uspjeh[i].GetPredmeti().getElement1(j)->ProsjekDatuma());
                     }
                 }

@@ -1,11 +1,9 @@
-#include <iostream>
-#include <ostream>
-#include <regex>
-#include <thread>
-#include <vector>
-#include <mutex>
-#include <string>
-
+#include<iostream>
+#include<vector>
+#include<string>
+#include<regex>
+#include<mutex>
+#include<thread>
 using namespace std;
 
 const char* PORUKA = "\n-------------------------------------------------------------------------------\n"
@@ -24,9 +22,8 @@ const char* PORUKA = "\n--------------------------------------------------------
 "-------------------------------------------------------------------------------\n";
 
 const char* crt = "\n-------------------------------------------\n";
-enum eRazred { PRVI = 0, DRUGI, TRECI, CETVRTI };
-const char* eRazredIspis[]{ "PRVI", "DRUGI", "TRECI", "CETVRTI" };
-const char* NOT_VALID = "NOT VALID";
+enum eRazred { PRVI = 1, DRUGI, TRECI, CETVRTI };
+const char* ispisRazreda[]{ "PRVI" , "DRUGI", "TRECI" ,"CETVRTI" };
 
 char* GetNizKaraktera(const char* sadrzaj) {
     if (sadrzaj == nullptr)return nullptr;
@@ -37,7 +34,7 @@ char* GetNizKaraktera(const char* sadrzaj) {
 }
 
 bool ValidirajBrojTelefona(string broj) {
-    return regex_match(broj, regex("[+][0-9]{2,3}[0]?[0-9]{2}[0-9]{2,3}\\s?[-]?[0-9]{2,3}"));
+    return regex_match(broj, regex("[+][0-9]{2,3}[0]?[0-9]{2,3}[0-9]{2,3}[-]?[\\s]?[0-9]{2,3}"));
 }
 
 template<class T1, class T2>
@@ -46,15 +43,6 @@ class Kolekcija {
     T2* _elementi2;
     int _trenutno;
     bool _omoguciDupliranje;
-    bool PostojiLiIsti(T1 el1, T2 el2) {
-        for (int i = 0; i < _trenutno; i++)
-        {
-            if (el1 == _elementi1[i] && el2 == _elementi2[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
 public:
     Kolekcija(bool omoguciDupliranje = true) {
         _elementi1 = nullptr;
@@ -63,12 +51,11 @@ public:
         _trenutno = 0;
     }
     Kolekcija(const Kolekcija& obj) {
-        _omoguciDupliranje = obj._omoguciDupliranje;
         _trenutno = obj._trenutno;
+        _omoguciDupliranje = obj._omoguciDupliranje;
         _elementi1 = new T1[_trenutno];
         _elementi2 = new T2[_trenutno];
-        for (int i = 0; i < _trenutno; i++)
-        {
+        for (size_t i = 0; i < _trenutno; i++) {
             _elementi1[i] = obj._elementi1[i];
             _elementi2[i] = obj._elementi2[i];
         }
@@ -102,24 +89,29 @@ public:
     bool operator !=(Kolekcija obj) {
         return !(*this == obj);
     }
-    Kolekcija<T1, T2> operator()(int pocetak, int kraj) {
-        if (pocetak < 0 || kraj > _trenutno) {
-            throw exception("Nevazeca lokacija!");
+
+    Kolekcija operator()(int pocetak, int kraj) {
+        Kolekcija add;
+        if (pocetak < 0 || kraj > _trenutno)
+            throw exception("Preskocen opseg!");
+        for (size_t i = pocetak; i <= kraj; i++) {
+            add.AddElement(_elementi1[i], _elementi2[i]);
         }
-        Kolekcija<T1, T2> temp;
-        for (int i = pocetak; i <= kraj; i++)
-        {
-            temp.AddElement(_elementi1[i], _elementi2[i]);
-        }
-        return temp;
+        return add;
     }
+
     ~Kolekcija() {
         delete[]_elementi1; _elementi1 = nullptr;
         delete[]_elementi2; _elementi2 = nullptr;
     }
+
     void AddElement(T1 el1, T2 el2) {
-        if (!_omoguciDupliranje && PostojiLiIsti(el1, el2))
-            throw exception("Nije moguce dodavanje duplih elemenata!");
+        if (!_omoguciDupliranje) {
+            for (size_t i = 0; i < _trenutno; i++) {
+                if (_elementi1[i] == el1 && _elementi2[i] == el2)
+                    throw exception("Nema dupliranja!");
+            }
+        }
         T1* temp1 = new T1[_trenutno + 1];
         T2* temp2 = new T2[_trenutno + 1];
         for (int i = 0; i < _trenutno; i++)
@@ -137,15 +129,17 @@ public:
         temp1 = nullptr;
         temp2 = nullptr;
     }
+
     T1& getElement1(int lokacija)const { return _elementi1[lokacija]; }
     T2& getElement2(int lokacija)const { return _elementi2[lokacija]; }
-    int getTrenutno()const { return _trenutno; }
+    int getTrenutno() const { return _trenutno; }
     friend ostream& operator<< (ostream& COUT, const Kolekcija& obj) {
         for (size_t i = 0; i < obj._trenutno; i++)
             COUT << obj.getElement1(i) << " " << obj.getElement2(i) << endl;
         return COUT;
     }
 };
+
 class Datum {
     int* _dan, * _mjesec, * _godina;
 public:
@@ -161,30 +155,25 @@ public:
     }
     Datum& operator=(const Datum& obj) {
         if (this != &obj) {
-            delete _dan;
-            delete _mjesec;
-            delete _godina;
             _dan = new int(*obj._dan);
             _mjesec = new int(*obj._mjesec);
             _godina = new int(*obj._godina);
         }
         return *this;
     }
-    bool operator==(Datum obj) {
-        return *_godina == *obj._godina
-            && *_mjesec == *obj._mjesec
-            && *_dan == *obj._dan;
+    int toDays() const {
+        return *_godina * 365 + *_mjesec * 30 + *_dan;
     }
-    bool operator!=(Datum obj) {
+    bool operator==(const Datum& obj) {
+        return *_godina == *obj._godina && *_mjesec == *obj._mjesec && *_dan == *obj._dan;
+    }
+    bool operator!=(Datum& obj) {
         return !(obj == *this);
     }
-    int ToDays() const {
-        return *_dan + *_mjesec * 30 + *_godina * 365;
+    bool operator>(const Datum& obj) {
+        return this->toDays() > obj.toDays();
     }
-    bool operator>(const Datum &drugi)
-    {
-        return this->ToDays() > drugi.ToDays();
-    }
+
     ~Datum() {
         delete _dan; _dan = nullptr;
         delete _mjesec; _mjesec = nullptr;
@@ -202,7 +191,7 @@ class Predmet {
 public:
     Predmet(const char* naziv = "", Datum datum = Datum(), int ocjena = 0) {
         _naziv = GetNizKaraktera(naziv);
-        _ocjene = new Kolekcija<Datum*, int>();
+        _ocjene = new Kolekcija<Datum*, int>(ocjena);
         if (ocjena > 0)
             AddOcjena(datum, ocjena);
     }
@@ -210,60 +199,61 @@ public:
         _naziv = GetNizKaraktera(obj._naziv);
         _ocjene = new Kolekcija<Datum*, int>(*obj._ocjene);
     }
-    Predmet& operator=(const Predmet& obj) {
-        if (this != &obj) {
-            delete[]_naziv;
-            delete _ocjene;
-            _naziv = GetNizKaraktera(obj._naziv);
-            _ocjene = new Kolekcija<Datum*, int>(*obj._ocjene);
-        }
-        return *this;
-    }
+
     float ProsjekDatuma() {
         float prosjek = 0;
         if (_ocjene->getTrenutno() < 1)
             return prosjek;
         for (int i = 0; i < _ocjene->getTrenutno() - 1; i++)
         {
-            prosjek += abs(_ocjene->getElement1(i)->ToDays() - _ocjene->getElement1(i + 1)->ToDays());
+            prosjek += abs(_ocjene->getElement1(i)->toDays() - _ocjene->getElement1(i + 1)->toDays());
         }
         return float(prosjek / _ocjene->getTrenutno());
     }
+
     bool operator==(Predmet obj) {
         return strcmp(_naziv, obj._naziv) == 0;
     }
     bool operator != (Predmet obj) {
         return !(*this != obj);
     }
+
+    Predmet& operator=(const Predmet& obj) {
+        if (this != &obj) {
+            _naziv = GetNizKaraktera(obj._naziv);
+            _ocjene = new Kolekcija<Datum*, int>(*obj._ocjene);
+        }
+        return *this;
+    }
+    void AddOcjena(Datum& datumOcjene, int ocjena) {
+        _ocjene->AddElement(new Datum(datumOcjene), ocjena);
+    }
     float ProsjekPredmeta() {
         float prosjek = 0;
         if (_ocjene->getTrenutno() == 0)
             return prosjek;
-        for (int i = 0; i < _ocjene->getTrenutno(); i++)
-        {
+        for (size_t i = 0; i < _ocjene->getTrenutno(); i++) {
             prosjek += _ocjene->getElement2(i);
         }
         return float(prosjek / _ocjene->getTrenutno());
     }
-    friend ostream& operator<< (ostream& COUT, Predmet& obj) {
-        COUT << "Predmet: " << obj._naziv << endl;
-        COUT << "Ocjene: " << endl;
-        for (int i = 0; i < obj._ocjene->getTrenutno(); i++)
-        {
-            COUT << *obj._ocjene->getElement1(i) << " " << obj._ocjene->getElement2(i) << endl;
-        }
-        COUT << "Prosjek: " << obj.ProsjekPredmeta() << endl;
-        return COUT;
-    }
-    void AddOcjena(Datum& datum, int ocjena) {
-        _ocjene->AddElement(new Datum(datum), ocjena);
-    }
+
     ~Predmet() {
         delete[] _naziv; _naziv = nullptr;
-        delete _ocjene; _ocjene = nullptr;
     }
     char* GetNaziv() { return _naziv; }
-    Kolekcija<Datum*, int> GetOcjene() { return *_ocjene; }
+    Kolekcija<Datum*, int> GetOcjene() { return _ocjene; }
+
+    friend ostream& operator<< (ostream& COUT, Predmet& obj) {
+        COUT << "Naziv: " << obj._naziv << endl;
+        COUT << ":::DATUM ::: OCJENE:::" << endl;
+        for (size_t i = 0; i < obj._ocjene->getTrenutno(); i++) {
+            COUT << "Datum: " << *obj._ocjene->getElement1(i) << ", ocjena: " << obj._ocjene->getElement2(i) << endl;
+        }
+        cout << "Prosjek: " << obj.ProsjekPredmeta() << endl;
+        return COUT;
+    }
+
 };
 
 class Uspjeh {
@@ -279,25 +269,6 @@ public:
         _razred = obj._razred;
         _polozeniPredmeti = obj._polozeniPredmeti;
     }
-    bool PostojiLiIstiPredmet(Predmet obj) {
-        for (int i = 0; i < _polozeniPredmeti.getTrenutno(); i++)
-        {
-            if (*_polozeniPredmeti.getElement1(i) == obj)
-                return true;
-        }
-        return false;
-    }
-    float ProsjekRazreda() {
-        float prosjek = 0;
-        if (_polozeniPredmeti.getTrenutno() == 0) {
-            return prosjek;
-        }
-        for (int i = 0; i < _polozeniPredmeti.getTrenutno(); i++)
-        {
-            prosjek += _polozeniPredmeti.getElement1(i)->ProsjekPredmeta();
-        }
-        return float(prosjek / _polozeniPredmeti.getTrenutno());
-    }
     Uspjeh& operator=(const Uspjeh& obj) {
         if (this != &obj) {
             _razred = obj._razred;
@@ -305,17 +276,28 @@ public:
         }
         return *this;
     }
+
+    float ProsjekSvihPredmeta() {
+        float prosjek = 0;
+        if (_polozeniPredmeti.getTrenutno() == 0)
+            return prosjek;
+        for (size_t i = 0; i < _polozeniPredmeti.getTrenutno(); i++) {
+            prosjek += _polozeniPredmeti.getElement1(i)->ProsjekPredmeta();
+        }
+        return float(prosjek / _polozeniPredmeti.getTrenutno());
+    }
+
     Kolekcija<Predmet*, const char*>& GetPredmeti() { return _polozeniPredmeti; }
     eRazred GetERazred() const { return _razred; }
     friend ostream& operator<< (ostream& COUT, const Uspjeh& obj) {
-        COUT << "Razred: " << eRazredIspis[obj._razred] << " " << endl;
-        for (int i = 0; i < obj._polozeniPredmeti.getTrenutno(); i++)
-        {
-            COUT << *obj._polozeniPredmeti.getElement1(i) << " " << obj._polozeniPredmeti.getElement2(i) << endl;
+        COUT << "Razred: " << ispisRazreda[obj._razred] << endl;
+        for (size_t i = 0; i < obj._polozeniPredmeti.getTrenutno(); i++) {
+            COUT << *obj._polozeniPredmeti.getElement1(i) << " - " << obj._polozeniPredmeti.getElement2(i) << endl;
         }
         return COUT;
     }
 };
+
 
 mutex m;
 class Kandidat {
@@ -323,75 +305,104 @@ class Kandidat {
     string _emailAdresa;
     string _brojTelefona;
     vector<Uspjeh> _uspjeh;
-    void PosaljiMail(eRazred razred, float prosjek) {
+
+    void SaljiMail(eRazred razred, float prosjekRazreda, float prosjekSkolovanja) {
         m.lock();
-        cout << "FROM: info@fit.ba" << endl;
-        cout << "TO: " << GetEmail() << endl;
-        cout << "Postovani " << GetImePrezime() << ", evidentirali ste uspjeh za " << eRazredIspis[razred] << " razred." << endl;
-        cout << "Dosadasnji uspjeh (prosjek) na nivou " << eRazredIspis[razred] << " razreda iznosi " << prosjek << ", a ukupni uspjeh u toku skolovanja iznosi: " << UkupniProsjek() << "." << endl;
-        cout << "Pozdrav." << endl << "FIT Team." << endl;
+        cout << "\nFROM:info@fit.ba" << endl;
+        cout << "TO: " << _emailAdresa << endl;
+        cout << "Postovani: " << _imePrezime << ", evidentirali ste uspjeh za: " << ispisRazreda[razred] << "." << endl;
+        cout << "Dosadasnji uspjeh (prosjek) na nivou: " << ispisRazreda[razred] << " iznosi: " << prosjekRazreda << ", a ukupni uspjeh u toku skolovanja iznosi: " << prosjekSkolovanja << endl;
+        cout << "Pozdrav\nFIT Team." << endl;
+        m.unlock();
+    }
+    void SaljiSMS(eRazred razred, float prosjekSkolovanja) {
+        m.lock();
+        cout << "Svaka cast za uspjeh: " << prosjekSkolovanja << " u " << ispisRazreda[razred] << " razredu." << endl;
         m.unlock();
     }
 public:
     Kandidat(const char* imePrezime, string emailAdresa, string brojTelefona) {
         _imePrezime = GetNizKaraktera(imePrezime);
         _emailAdresa = emailAdresa;
-        _brojTelefona = ValidirajBrojTelefona(brojTelefona) ? _brojTelefona : NOT_VALID;
+        if (ValidirajBrojTelefona(emailAdresa))
+            _emailAdresa = emailAdresa;
+        else
+            _emailAdresa = "NOT VALID";
+
     }
     Kandidat(const Kandidat& obj) {
         _imePrezime = GetNizKaraktera(obj._imePrezime);
         _emailAdresa = obj._emailAdresa;
-        _brojTelefona = ValidirajBrojTelefona(obj._brojTelefona) ? _brojTelefona : NOT_VALID;
+        /*_brojTelefona = ValidirajBrojTelefona(obj._brojTelefona) ? _brojTelefona : NOT_VALID;*/
+        _brojTelefona = obj._brojTelefona;
         _uspjeh = obj._uspjeh;
     }
     Kandidat& operator=(const Kandidat& obj) {
         if (this != &obj) {
             _imePrezime = GetNizKaraktera(obj._imePrezime);
             _emailAdresa = obj._emailAdresa;
-            _brojTelefona = ValidirajBrojTelefona(obj._brojTelefona) ? _brojTelefona : NOT_VALID;
+            _brojTelefona = obj._brojTelefona;
             _uspjeh = obj._uspjeh;
         }
         return *this;
     }
-    ~Kandidat() {
-        delete[] _imePrezime; _imePrezime = nullptr;
-    }
-    float UkupniProsjek() {
+
+    float GetProsjekRazreda(eRazred razred) {
         float prosjek = 0;
         if (_uspjeh.size() == 0)
-        {
             return prosjek;
+
+        for (size_t i = 0; i < _uspjeh.size(); i++) {
+            if (_uspjeh[i].GetERazred() == razred) {
+                for (size_t j = 0; j < _uspjeh[i].GetPredmeti().getTrenutno(); j++) {
+                    prosjek += _uspjeh[i].GetPredmeti().getElement1(j)->ProsjekPredmeta();
+                }
+                return prosjek / _uspjeh[i].GetPredmeti().getTrenutno();
+            }
         }
-        for (int i = 0; i < _uspjeh.size(); i++)
-        {
-            prosjek += _uspjeh[i].ProsjekRazreda();
-        }
-        return float(prosjek / _uspjeh.size());
     }
-    bool AddPredmet(eRazred razred, Predmet predmet, const char* napomena = " ") {
-        if (predmet.ProsjekPredmeta() < 2.5) {
-            return false;
+
+    bool ProvjerIste(eRazred razred, Predmet& predmet) {
+        for (size_t i = 0; i < _uspjeh.size(); i++) {
+            if (_uspjeh[i].GetERazred() == razred) {
+                for (size_t j = 0; j < _uspjeh[i].GetPredmeti().getTrenutno(); j++) {
+                    if (*_uspjeh[i].GetPredmeti().getElement1(j) == predmet)
+                        return true;
+                }
+            }
         }
-        for (int i = 0; i < _uspjeh.size(); i++)
-        {
-            if (razred == _uspjeh[i].GetERazred()) {
-                if (_uspjeh[i].GetPredmeti().getTrenutno() == 5) {
+        return false;
+    }
+
+    bool AddPredmet(eRazred razred, Predmet& predmet, const char* napomena = "---") {
+        for (size_t i = 0; i < _uspjeh.size(); i++) {
+            if (_uspjeh[i].GetERazred() == razred) {
+                if (predmet.ProsjekPredmeta() < 2.5)
                     return false;
-                }
-                if (_uspjeh[i].PostojiLiIstiPredmet(predmet)) {
+                if (ProvjerIste(razred, predmet))
                     return false;
-                }
+                if (_uspjeh[i].GetPredmeti().getTrenutno() >= 5)
+                    return false;
+
                 _uspjeh[i].GetPredmeti().AddElement(new Predmet(predmet), napomena);
-                thread mail(&Kandidat::PosaljiMail, this, razred, _uspjeh[i].ProsjekRazreda());
-                mail.join();
+                float prosjekRazreda = GetProsjekRazreda(razred);
+                float prosjehSkolovanja = _uspjeh[i].ProsjekSvihPredmeta();
+                thread t1(&Kandidat::SaljiMail, this, razred, prosjekRazreda, prosjehSkolovanja);
+                t1.join();
+                if (prosjekRazreda >= 4.5) {
+                    thread sms(&Kandidat::SaljiSMS, this, razred, prosjehSkolovanja);
+                    sms.join();
+                }
                 return true;
             }
         }
-        Uspjeh novi(razred);
-        novi.GetPredmeti().AddElement(new Predmet(predmet), napomena);
-        _uspjeh.push_back(novi);
-        thread mail(&Kandidat::PosaljiMail, this, razred, novi.ProsjekRazreda());
-        mail.join();
+        Uspjeh u(razred);
+        u.GetPredmeti().AddElement(new Predmet(predmet), napomena);
+        _uspjeh.push_back(u);
+        float prosjekRazreda = GetProsjekRazreda(razred);
+        float prosjehSkolovanja = u.ProsjekSvihPredmeta();
+        thread t1(&Kandidat::SaljiMail, this, razred, prosjekRazreda, prosjehSkolovanja);
+        t1.join();
         return true;
     }
 
@@ -412,6 +423,10 @@ public:
             }
         }
         return temp;
+    }
+
+    ~Kandidat() {
+        delete[] _imePrezime; _imePrezime = nullptr;
     }
     friend ostream& operator<< (ostream& COUT, Kandidat& obj) {
         COUT << obj._imePrezime << " " << obj._emailAdresa << " " << obj._brojTelefona << endl;
@@ -438,7 +453,6 @@ void main() {
 
     cout << PORUKA;
     cin.get();
-
     cout << GetOdgovorNaPrvoPitanje() << endl;
     cin.get();
     cout << GetOdgovorNaDrugoPitanje() << endl;

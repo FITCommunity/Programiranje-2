@@ -407,27 +407,23 @@ public:
 
     tuple<int, int, int> GetBrojZnakova(const char* naziv)
     {
-        int velikaSlova = 0, malaSlova = 0, brojRazmaka = 0;
+       int velikaSlova = 0, malaSlova = 0, brojRazmaka = 0;
         char znak;
         ifstream fajl(naziv);
         if (!fajl.fail())
         {
             while (fajl.get(znak))
             {
-                if (znak >= 65 && znak <= 90)
+                if (znak >= 'A' && znak <= 'Z')
                     velikaSlova++;
-                else if (znak >= 97 && znak <= 122)
+                else if (znak >= 'a' && znak <= 'z')
                     malaSlova++;
                 else if (znak == ' ')
                     brojRazmaka++;
             }
         }
         fajl.close();
-        tuple<int, int, int> brojZnakova;
-        get<0>(brojZnakova) = velikaSlova;
-        get<1>(brojZnakova) = malaSlova;
-        get<2>(brojZnakova) = brojRazmaka;
-        return brojZnakova;
+        return { velikaSlova,malaSlova, brojRazmaka };
     }
 };
 

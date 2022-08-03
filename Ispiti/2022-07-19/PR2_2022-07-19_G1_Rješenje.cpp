@@ -3,7 +3,6 @@
 #include <string>
 #include <thread>
 #include <mutex>
-#include<chrono>
 #include <fstream>
 
 using namespace std;
@@ -98,7 +97,7 @@ public:
 	{
 		if (!_omoguciDupliranje)
 			for (int i = 0; i < _trenutno; i++)
-				if (_elementi1[i]==e1 && _elementi2[i] == e2)
+				if (_elementi1[i] == e1 && _elementi2[i] == e2)
 					throw exception("Postoje isti elementi u kolekciji!");
 		T1* temp1 = _elementi1;
 		T2* temp2 = _elementi2;
@@ -132,10 +131,10 @@ public:
 			0 0		    0 0
 			1 1		    1 1
 			2 2       2 2
-					     ----
+						 ----
 			----
 			*/
-			if (i != obj.getTrenutno() - 1)  
+			if (i != obj.getTrenutno() - 1)
 				COUT << endl;
 		}
 		return COUT;
@@ -226,8 +225,8 @@ public:
 		for (int i = 0; i < obj._komentariKarakteristika.getTrenutno(); i++)
 		{
 			COUT << "\t" << obj.GetKomentareKarakteristika().getElement1(i) << " - " << obj.GetKomentareKarakteristika().getElement2(i);
-			
-			//razlog dodavanja if uslova je isti kao kod ispisa kolekcije (linija 138)
+
+			//razlog dodavanja if uslova je isti kao kod ispisa kolekcije (linija 137)
 			if (i != obj._komentariKarakteristika.getTrenutno() - 1)
 				COUT << endl;
 		}
@@ -271,7 +270,7 @@ public:
 	}
 };
 mutex mjuteks;
-class Kupac:public Osoba {
+class Kupac :public Osoba {
 	char* _emailAdresa;
 	//float se odnosi na iznos racuna za odredjenu kupovinu
 	Rjecnik<float, ZadovoljstvoKupca>* _kupovine;
@@ -285,13 +284,13 @@ class Kupac:public Osoba {
 		mjuteks.unlock();
 	}
 public:
-	Kupac(const char* imePrezime = "", Datum datumRodjenja = Datum(), const char* emailAdresa = ""):
+	Kupac(const char* imePrezime = "", Datum datumRodjenja = Datum(), const char* emailAdresa = "") :
 		Osoba(imePrezime, datumRodjenja)
 	{
 		_emailAdresa = GetNizKaraktera(emailAdresa);
 		_kupovine = new Rjecnik<float, ZadovoljstvoKupca>(false);
 	}
-	Kupac(const Kupac& obj):
+	Kupac(const Kupac& obj) :
 		Osoba(obj._imePrezime, obj._datumRodjenja)
 	{
 		_emailAdresa = GetNizKaraktera(obj._emailAdresa);
@@ -330,27 +329,27 @@ public:
 	void DodajKupovinu(float iznos, ZadovoljstvoKupca zadovoljstvo)
 	{
 		_kupovine->AddElement(iznos, zadovoljstvo);
-		if(iznos>=10) //ne zelimo dodati 0 bodova u vector pa stavljamo ovaj uslov
+		if (iznos >= 10) //ne zelimo dodati 0 bodova u vector pa stavljamo ovaj uslov
 			_bodovi.push_back(iznos / 10);
 		if (_bodovi.size() != 0)
 		{
 			int zadnjiBodovi = _bodovi[_bodovi.size() - 1];
 			if (zadnjiBodovi > 5)
 			{
-				this_thread::sleep_for(std::chrono::seconds(3));
+				this_thread::sleep_for(chrono::seconds(3));
 				thread t1(&Kupac::posaljiMail, this, zadnjiBodovi);
 				t1.join();
 			}
 		}
 	}
-	
-   /*metoda SacuvajBodove treba sve clanove vector-a _bodovi upisati u fajl(ignorisuci ranije dodate/postojece vrijednosti u fajlu) pod nazivom emailKorisnika.txt npr. denis@fit.ba.txt.
-	na osnovu trenutnog stanja objekta, sadrzaj fajla denis@fit.ba.txt bi trebao biti sljedeci:
-	12
-	8
 
-	nakon spasavanja u fajl, sadrzaj vector-a ostaje nepromijenjen.
-	*/
+	/*metoda SacuvajBodove treba sve clanove vector-a _bodovi upisati u fajl(ignorisuci ranije dodate/postojece vrijednosti u fajlu) pod nazivom emailKorisnika.txt npr. denis@fit.ba.txt.
+	 na osnovu trenutnog stanja objekta, sadrzaj fajla denis@fit.ba.txt bi trebao biti sljedeci:
+	 12
+	 8
+
+	 nakon spasavanja u fajl, sadrzaj vector-a ostaje nepromijenjen.
+	 */
 	void SacuvajBodove() {
 		string naziv = _emailAdresa;
 		naziv += ".txt";
@@ -372,7 +371,7 @@ public:
 		string naziv = _emailAdresa;
 		naziv += ".txt";
 		ifstream fajl(naziv);
-		const int max = 20; 
+		const int max = 20;
 		char red[max]; //ovo je niz karaktera u koji pohranjujemo vrijednost jednog reda iz fajla
 		string brojStr;
 		int broj;
@@ -382,14 +381,14 @@ public:
 			brojStr = red; //radi lakoce rada sa stringom i sljedecom ugradjenom funkcijom u string brojStr pohranjujemo vrijednost reda
 			broj = stoi(brojStr); //stoi funkcija konvertuje string u integer
 			_bodovi.push_back(broj);
-			}
+		}
 		fajl.close();
 	}
 	Rjecnik<Karakteristike, const char*> GetKupovineByKomentar(const char* kljucnaRijec)
 	{
 		Rjecnik<Karakteristike, const char*> rjecnik;
 		string trazeni = kljucnaRijec;
-		for (int i = 0; i <_kupovine->getTrenutno(); i++)
+		for (int i = 0; i < _kupovine->getTrenutno(); i++)
 		{
 			for (int j = 0; j < _kupovine->getElement2(i).GetKomentareKarakteristika().getTrenutno(); j++)
 			{
@@ -487,14 +486,14 @@ void main() {
 	Kupac* denis = dynamic_cast<Kupac*>(kupci[0]);
 	/*za svakih 10KM kupcu se dodaje 1 bod, pa ce tako kupovina od 128KM kupcu donijeti 12 bodova*/
 	denis->DodajKupovinu(128, zadovoljstvoKupca);
-	cout << "Ukupno bodova -> " << denis->GetBodoviUkupno()<<endl;//12 bodova
+	cout << "Ukupno bodova -> " << denis->GetBodoviUkupno() << endl;//12 bodova
 
 
 	ZadovoljstvoKupca zadovoljstvoKupca2(4);
 	zadovoljstvoKupca2.DodajKomentarKarakteristike(KVALITET, "Jako lose, proizvod ostecen");
 	denis->DodajKupovinu(81, zadovoljstvoKupca2);
 
-	cout << "Ukupno bodova -> " << denis->GetBodoviUkupno()<<endl; //20 bodova
+	cout << "Ukupno bodova -> " << denis->GetBodoviUkupno() << endl; //20 bodova
 
 	 /*prilikom svake kupovine, ukoliko je kupac ostvario vise od 5 bodova, potrebno je, u zasebnom thread-u (nakon 3 sekunde), poslati email sa sljedecim sadrzajem:
 
@@ -513,7 +512,7 @@ void main() {
    //ispisuje sve podatke o kupcu i njegovim kupovinama.
 
 	denis->Info();
-	
+
 	/* Primjer ispisa:
 		-------------------------------------------
 		Denis Music 12.1.1980 denis@fit.ba
@@ -538,15 +537,15 @@ void main() {
 
    nakon spasavanja u fajl, sadrzaj vector-a ostaje nepromijenjen.
    */
-	
+
 	denis->SacuvajBodove();
-	
+
 	//metoda UcitajBodove ucitava sadrzaj fajla pod nazivom emailKorisnika.txt i njegove vrijednosti pohranjuje/dodaje u vector _bodovi (zadrzavajuci postojece bodove).  
-	
+
 	denis->UcitajBodove();
 
 	//metoda GetKupovineByKomentar treba da pronadje i vrati sve karakteristike proizvoda i komentare kupaca koji sadrze vrijednost proslijedjenog parametra
-	
+
 	Rjecnik<Karakteristike, const char*> osteceniProizvodi = denis->GetKupovineByKomentar("ostecen");
 	cout << crt << "Rezultat pretrage -> " << crt << osteceniProizvodi << crt;
 
@@ -559,7 +558,7 @@ void main() {
 		-------------------------------------------
 	*/
 
-	//denis->Info();
+	
 
 	for (size_t i = 0; i < maxKupaca; i++)
 		delete kupci[i], kupci[i] = nullptr;

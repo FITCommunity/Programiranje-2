@@ -128,10 +128,10 @@ public:
 			//te dodatni endl rezultira praznim redom
 			/*
 			----      ----
-			0 0		    0 0
-			1 1		    1 1
+			0 0	  0 0
+			1 1	  1 1
 			2 2       2 2
-						 ----
+				  ----
 			----
 			*/
 			if (i != obj.getTrenutno() - 1)
@@ -342,8 +342,7 @@ public:
 			}
 		}
 	}
-
-	/*metoda SacuvajBodove treba sve clanove vector-a _bodovi upisati u fajl(ignorisuci ranije dodate/postojece vrijednosti u fajlu) pod nazivom emailKorisnika.txt npr. denis@fit.ba.txt.
+	 /*metoda SacuvajBodove treba sve clanove vector-a _bodovi upisati u fajl(ignorisuci ranije dodate/postojece vrijednosti u fajlu) pod nazivom emailKorisnika.txt npr. denis@fit.ba.txt.
 	 na osnovu trenutnog stanja objekta, sadrzaj fajla denis@fit.ba.txt bi trebao biti sljedeci:
 	 12
 	 8
@@ -378,8 +377,8 @@ public:
 		while (!fajl.eof())
 		{
 			fajl.getline(red, max);
-			brojStr = red; //radi lakoce rada sa stringom i sljedecom ugradjenom funkcijom u string brojStr pohranjujemo vrijednost reda
-			broj = stoi(brojStr); //stoi funkcija konvertuje string u integer
+			brojStr = red; //radi lakoce rada sa stringom u string pohranjujemo sadrzaj iz reda
+			broj = stoi(brojStr); //stoi funkcija konvertuje string u integer, uzrokuje runtime error ako string nije broj te smo zbog toga na 362. liniji provjeravali da ne dodamo viska novi red koji je ustvari ""
 			_bodovi.push_back(broj);
 		}
 		fajl.close();
@@ -558,7 +557,7 @@ void main() {
 		-------------------------------------------
 	*/
 
-	
+
 
 	for (size_t i = 0; i < maxKupaca; i++)
 		delete kupci[i], kupci[i] = nullptr;

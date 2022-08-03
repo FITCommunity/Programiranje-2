@@ -126,14 +126,6 @@ public:
 
 			//ovaj if uslov sluzi da nemamo viska novih redova jer u main-u imamo crt nakon ispisa kolekcije,
 			//te dodatni endl rezultira praznim redom
-			/*
-			----      ----
-			0 0	  0 0
-			1 1	  1 1
-			2 2       2 2
-				  ----
-			----
-			*/
 			if (i != obj.getTrenutno() - 1)
 				COUT << endl;
 		}
@@ -226,7 +218,7 @@ public:
 		{
 			COUT << "\t" << obj.GetKomentareKarakteristika().getElement1(i) << " - " << obj.GetKomentareKarakteristika().getElement2(i);
 
-			//razlog dodavanja if uslova je isti kao kod ispisa kolekcije (linija 137)
+			//razlog dodavanja if uslova je isti kao kod ispisa kolekcije (linija 129)
 			if (i != obj._komentariKarakteristika.getTrenutno() - 1)
 				COUT << endl;
 		}
@@ -342,13 +334,13 @@ public:
 			}
 		}
 	}
-	 /*metoda SacuvajBodove treba sve clanove vector-a _bodovi upisati u fajl(ignorisuci ranije dodate/postojece vrijednosti u fajlu) pod nazivom emailKorisnika.txt npr. denis@fit.ba.txt.
-	 na osnovu trenutnog stanja objekta, sadrzaj fajla denis@fit.ba.txt bi trebao biti sljedeci:
-	 12
-	 8
+	/*metoda SacuvajBodove treba sve clanove vector-a _bodovi upisati u fajl(ignorisuci ranije dodate/postojece vrijednosti u fajlu) pod nazivom emailKorisnika.txt npr. denis@fit.ba.txt.
+	na osnovu trenutnog stanja objekta, sadrzaj fajla denis@fit.ba.txt bi trebao biti sljedeci:
+	12
+	8
 
-	 nakon spasavanja u fajl, sadrzaj vector-a ostaje nepromijenjen.
-	 */
+	nakon spasavanja u fajl, sadrzaj vector-a ostaje nepromijenjen.
+	*/
 	void SacuvajBodove() {
 		string naziv = _emailAdresa;
 		naziv += ".txt";
@@ -378,8 +370,17 @@ public:
 		{
 			fajl.getline(red, max);
 			brojStr = red; //radi lakoce rada sa stringom u string pohranjujemo sadrzaj iz reda
-			broj = stoi(brojStr); //stoi funkcija konvertuje string u integer, uzrokuje runtime error ako string nije broj te smo zbog toga na 362. liniji provjeravali da ne dodamo viska novi red koji je ustvari ""
+			broj = stoi(brojStr); //stoi funkcija konvertuje string u integer, uzrokuje runtime error ako string nije broj te smo zbog toga na 354. liniji provjeravali da ne dodamo viska novi red koji je ustvari "" (odnosno nije broj)
 			_bodovi.push_back(broj);
+			/*
+				ako ne zelimo dodati if usov na 354. liniji onda bi ovdje samo dodali uslov:
+					if(brojStr=="") 
+					{
+						broj=stoi(brojStr);
+						_bodovi.push_back(broj);
+					}
+				bez ovog uslova i uslova na 354. liniji desio bi se runtime error
+			*/
 		}
 		fajl.close();
 	}
@@ -392,7 +393,7 @@ public:
 			for (int j = 0; j < _kupovine->getElement2(i).GetKomentareKarakteristika().getTrenutno(); j++)
 			{
 				string tekst = _kupovine->getElement2(i).GetKomentareKarakteristika().getElement2(j);
-				if (tekst.find(trazeni) != -1) //metoda find vraca lokaciju na kojoj pocinje trazeni substring u stringu, vraca -1 ako nije pronadjen substring, moguce koristiti string::npos umjesto -1
+				if (tekst.find(trazeni) != -1) //metoda find vraca lokaciju na kojoj pocinje trazeni substring u stringu, vraca -1 ako nije pronadjen substring, moguce koristiti string::npos umjesto -1 : if (tekst.find(trazeni) != string::npos)
 					rjecnik.AddElement(_kupovine->getElement2(i).GetKomentareKarakteristika().getElement1(j),
 						_kupovine->getElement2(i).GetKomentareKarakteristika().getElement2(j));
 			}

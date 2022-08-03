@@ -373,7 +373,7 @@ public:
 			broj = stoi(brojStr); //stoi funkcija konvertuje string u integer, uzrokuje runtime error ako string nije broj te smo zbog toga na 354. liniji provjeravali da ne dodamo viska novi red koji je ustvari "" (odnosno nije broj)
 			_bodovi.push_back(broj);
 			/*
-				ako ne zelimo dodati if usov na 354. liniji onda bi ovdje samo dodali uslov:
+				ako ne zelimo dodati if uslov na 354. liniji onda bi ovdje samo dodali uslov:
 					if(brojStr=="") 
 					{
 						broj=stoi(brojStr);

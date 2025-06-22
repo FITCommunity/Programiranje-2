@@ -4,6 +4,6 @@ Za ovu grupu postavka je postavljena na [github account od profesora](https://gi
 
 Enumeracija -> Karakteristike { NARUDZBA, KVALITET, PAKOVANJE, ISPORUKA }<br>
 Kolekcija (ovdje se zove Parovi) tip pokazivac na niz (T*)<br>
-Threads, lambdas, inheritance, string, vektor<br>
+Threads, lambdas, inheritance, string, vector<br>
 
 # Grupa 2 (G2) 

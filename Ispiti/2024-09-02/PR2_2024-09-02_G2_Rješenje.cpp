@@ -1,10 +1,16 @@
-/*
-	BIG DISCLAIMER
+﻿/*
+	DISCLAIMER
 
 	Ja nisam izlazio na ovaj rok, samo sam prikupio odredene informacije kroz pricu
 	drugih studenata i slika koje su nekako uslikane tokom ispita. Moguce je da postoji
 	mnogo vise razlicitih stvari nego sto sam naveo ovdje.
 	Teoretska pitanja sam obrisao jer o njima nisam cuo nista.
+
+	U slucaju da se ne podrazumijeva, na ispitu se ne daju (at least as of writing this)
+	ikakvi dodatni bodovi za "optimizovan kod", takoder ne oduzimaju bodovi (u ovom ispitu)
+	za memory leaks.
+	Zbog cega u odredenim situacijama ja cu radi jednostavnosti pisati kod u kojem ne uzimam
+	u obzir ista sem toga da se main moze pokrenut i nema ikakvih izuzetaka.
 */
 
 #include <iostream>
@@ -34,6 +40,7 @@ const char* crt = "\n-------------------------------------------\n";
 // Headers I included below
 #include<string>
 #include<regex>
+#include<chrono>
 #include<sstream>
 #include<thread>
 #include<iomanip>
@@ -56,19 +63,19 @@ char* GetNizKaraktera(const char* sadrzaj, bool dealociraj = false) {
 // Functions I added below
 std::ostream& operator<<(std::ostream& os, Drzava drzava) {
 	switch (drzava) {
-	case Drzava::ENGLESKA:
+	case ENGLESKA:
 		os << "ENGLESKA";
 		break;
-	case Drzava::SPANIJA:
+	case SPANIJA:
 		os << "SPANIJA";
 		break;
-	case Drzava::HOLANDIJA:
+	case HOLANDIJA:
 		os << "HOLANDIJA";
 		break;
-	case Drzava::FRANCUSKA:
+	case FRANCUSKA:
 		os << "FRANCUSKA";
 		break;
-	case Drzava::BOSNA_I_HERCEGOVINA:
+	case BOSNA_I_HERCEGOVINA:
 		os << "BOSNA_I_HERCEGOVINA";
 		break;
 	default:
@@ -78,7 +85,7 @@ std::ostream& operator<<(std::ostream& os, Drzava drzava) {
 	return os;
 }
 
-int reverseNum(int num) {
+int ReverseNum(int num) {
 	int reversedNum{ 0 };
 
 	while (num != 0) {
@@ -89,22 +96,22 @@ int reverseNum(int num) {
 	return reversedNum;
 }
 
-char* GenerisiID(const std::string& fullName, int num) {
+char* GenerisiID(const std::string& fullName, const int num) {
 	std::string ID{};
-	num = reverseNum(num);
+	const int reverseNum = ReverseNum(num);
 
-	const std::size_t nameLastLetterPos{ fullName.find(' ') - 1 };
-	const std::size_t surnameInitialPos{ fullName.find(' ') + 1 };
+	const int nameLastLetterPos = fullName.find(' ') - 1;
+	const int surnameInitialPos = fullName.find(' ') + 1;
 
 	ID += std::toupper(fullName[nameLastLetterPos]);
 
-	if (num < 10) {
+	if (reverseNum < 10) {
 		ID += "000";
 	}
-	else if (num < 100) {
+	else if (reverseNum < 100) {
 		ID += "00";
 	}
-	else if (num < 1000) {
+	else if (reverseNum < 1000) {
 		ID += '0';
 	}
 
@@ -120,24 +127,24 @@ bool ValidirajID(const std::string& id) {
 	return std::regex_match(id, idValidation);
 }
 
-std::string addFrontBackPaddingToText(const std::string& str, const std::size_t width) {
-	if (str.size() > width) {
+std::string AddFrontAndBackPaddingToStr(const std::string& str, const int expectedWidth) {
+	if (str.size() > expectedWidth) {
 		return str;
 	}
 
-	const std::size_t difference{ width - str.size() };
-	const std::size_t leftPadding{ difference / 2 };
-	const std::size_t rightPadding{ difference - leftPadding };
+	const int difference = expectedWidth - str.size();
+	const int leftPadding = difference / 2;
+	const int rightPadding = difference - leftPadding;
 
 	// Used for debugging
-	//std::cout << "difference -> " << difference << '\n';
-	//std::cout << "leftPadding -> " << leftPadding << '\n';
-	//std::cout << "rightPadding -> " << rightPadding << '\n';
+	// std::cout << "difference -> " << difference << '\n';
+	// std::cout << "leftPadding -> " << leftPadding << '\n';
+	// std::cout << "rightPadding -> " << rightPadding << '\n';
 
 	return std::string(leftPadding, ' ') + str + std::string(rightPadding, ' ');
 }
 
-std::string getDrzavaAsStr(const Drzava drzava) {
+std::string GetDrzavaAsStr(const Drzava drzava) {
 	std::ostringstream drzavaBuffer{};
 
 	drzavaBuffer << drzava;
@@ -160,11 +167,10 @@ public:
 
 	// Methods I added below
 	Kolekcija() = default;
-	~Kolekcija() = default;
 
 	Kolekcija(const Kolekcija& kolekcija)
-		: _trenutno{ kolekcija.getTrenutno() }
 	{
+		_trenutno = kolekcija.getTrenutno();
 		for (int i = 0; i < getTrenutno(); ++i) {
 			_elementi1[i] = kolekcija.getElement1(i);
 			_elementi2[i] = kolekcija.getElement2(i);
@@ -212,61 +218,41 @@ public:
 		++_trenutno;
 	}
 
-	Kolekcija InsertAt(const int index, const T1& element1, const T2& element2) {
-		if (getTrenutno() == max || index < 0 || index > getTrenutno()) {
-			return *this;
+	Kolekcija& InsertAt(const int index, const T1& element1, const T2& element2) {
+		Kolekcija kopijaSaDodanimElementom{};
+
+		for (int i = 0; i < getTrenutno(); ++i) {
+			if (i == index) {
+				kopijaSaDodanimElementom.AddElement(element1, element2);
+			}
+			kopijaSaDodanimElementom.AddElement(getElement1(i), getElement2(i));
 		}
 
-		for (int i = getTrenutno(); i > index; --i) {
-			_elementi1[i] = _elementi1[i - 1];
-			_elementi2[i] = _elementi2[i - 1];
-		}
-
-		_elementi1[index] = element1;
-		_elementi2[index] = element2;
-
-		++_trenutno;
+		*this = kopijaSaDodanimElementom;
 
 		return *this;
 	}
 
-	void RemoveAt(const int index) {
-		if (getTrenutno() == 0 || index < 0 || index >= getTrenutno()) {
-			return;
-		}
-
-		--_trenutno;
-
-		for (int i = index; i < getTrenutno(); ++i) {
-			_elementi1[i] = _elementi1[i + 1];
-			_elementi2[i] = _elementi2[i + 1];
-		}
-	}
-
 	Kolekcija* RemoveRange(const int start, const int end) {
-		if (start < 0) {
-			throw std::runtime_error("Start index nije u opsegu");
-		}
-		else if (end >= getTrenutno()) {
-			throw std::runtime_error("End index nije u opsegu");
-		}
-		else if (start > end) {
-			throw std::runtime_error("Start index je veci od end indexa");
-			/*
-				Posto komentar ima dio koji kaze "U slucaju da zahtijevani opseg ne postoji u kolekciji metoda treba baciti izuzetak"
-				vjerujem da je naglaseno da se uzme u obzir da ne bude da se ide od 6 do 1
-				Iako da se ovo proslijedi nece se nista desiti jer uslov for petlje ispod nece se ispuniti, so yeah
-			*/
+		if (start < 0 || end >= getTrenutno() || start >= end) {
+			throw std::runtime_error("Interval nije validan");
 		}
 
-		Kolekcija* temp{ new Kolekcija{} };
+		Kolekcija* elementiZaIzbacit{ new Kolekcija {} };
+		Kolekcija elementiZaZadrzat{};
 
-		for (int i = start; i <= end; ++i) {
-			temp->AddElement(getElement1(start), getElement2(start));
-			RemoveAt(start);
+		for (int i = 0; i < getTrenutno(); ++i) {
+			if (i >= start && i <= end) {
+				elementiZaIzbacit->AddElement(getElement1(i), getElement2(i));
+			}
+			else {
+				elementiZaZadrzat.AddElement(getElement1(i), getElement2(i));
+			}
 		}
 
-		return temp;
+		*this = elementiZaZadrzat;
+
+		return elementiZaIzbacit;
 	}
 };
 
@@ -352,8 +338,8 @@ public:
 		delete[] _napomena; _napomena = nullptr;
 		delete _vrijemePogotka; _vrijemePogotka = nullptr;
 	}
-	Vrijeme GetVrijemePogotka() { return *_vrijemePogotka; }
-	char* GetNapomena() { return _napomena; }
+	Vrijeme GetVrijemePogotka() const { return *_vrijemePogotka; }
+	char* GetNapomena() const { return _napomena; }
 	friend ostream& operator<< (ostream& COUT, const Pogodak& obj) {
 		COUT << *obj._vrijemePogotka << " -> " << obj._napomena;
 		return COUT;
@@ -361,34 +347,28 @@ public:
 
 	// Methods I added below
 	Pogodak(const Pogodak& pogodak)
-		: _vrijemePogotka{ new Vrijeme{ pogodak.getVrijemePogotka() } }
-		, _napomena{ GetNizKaraktera(pogodak.getNapomena()) }
-	{}
+	{
+		_vrijemePogotka = new Vrijeme{ pogodak.GetVrijemePogotka() };
+		_napomena = GetNizKaraktera(pogodak.GetNapomena());
+	}
 
 	Pogodak& operator=(const Pogodak& rhs) {
 		if (this == &rhs) {
 			return *this;
 		}
 
-		delete[] _napomena;
+		delete[] _napomena; _napomena = nullptr;
+		delete _vrijemePogotka; _vrijemePogotka = nullptr;
 
-		*_vrijemePogotka = rhs.getVrijemePogotka();
-		_napomena = GetNizKaraktera(rhs.getNapomena());
+		_vrijemePogotka = new Vrijeme{ rhs.GetVrijemePogotka() };
+		_napomena = GetNizKaraktera(rhs.GetNapomena());
 
 		return *this;
 	}
 
-	const Vrijeme& getVrijemePogotka() const {
-		return *_vrijemePogotka;
-	}
-
-	const char* getNapomena() const {
-		return _napomena;
-	}
-
 	bool operator==(const Pogodak& rhs) const {
-		return getVrijemePogotka() == rhs.getVrijemePogotka()
-			&& std::strcmp(getNapomena(), rhs.getNapomena()) == 0;
+		return GetVrijemePogotka() == rhs.GetVrijemePogotka()
+			&& std::string(GetNapomena()) == rhs.GetNapomena();
 	}
 
 	bool operator!=(const Pogodak& rhs) const {
@@ -408,10 +388,15 @@ public:
 		_imePrezime = GetNizKaraktera(imePrezime);
 	}
 	~Igrac() {
-		clearResources();
+		delete[] _ID; _ID = nullptr;
+		delete[] _imePrezime; _imePrezime = nullptr;
+		for (size_t i = 0; i < _pogoci.size(); i++) {
+			delete _pogoci[i];
+			_pogoci[i] = nullptr;
+		}
 	}
-	char* GetImePrezime() { return _imePrezime; }
-	char* GetID() { return _ID; }
+	char* GetImePrezime() const { return _imePrezime; }
+	char* GetID() const { return _ID; }
 	vector<Pogodak*>& GetPogoci() { return _pogoci; }
 	friend ostream& operator<< (ostream& COUT, Igrac& obj) {
 		COUT << obj._ID << " -> " << obj._imePrezime;
@@ -423,49 +408,38 @@ public:
 	// Methods I added below
 
 	Igrac(const Igrac& igrac)
-		: _ID{ GetNizKaraktera(igrac.getID()) }
-		, _imePrezime{ GetNizKaraktera(igrac.getImePrezime()) }
-		, _pogoci{ igrac.getPogociCopy() }
-	{}
+	{
+		_ID = GetNizKaraktera(igrac.GetID());
+		_imePrezime = GetNizKaraktera(igrac.GetImePrezime());
+		for (const Pogodak* const pogodak : igrac._pogoci) {
+			_pogoci.push_back(new Pogodak{ *pogodak });
+		}
+	}
 
 	Igrac& operator=(const Igrac& rhs) {
 		if (this == &rhs) {
 			return *this;
 		}
 
-		clearResources();
+		delete[] _ID; _ID = nullptr;
+		delete[] _imePrezime; _imePrezime = nullptr;
+		for (size_t i = 0; i < _pogoci.size(); i++) {
+			delete _pogoci[i];
+			_pogoci[i] = nullptr;
+		}
+		_pogoci.clear();
 
-		_ID = GetNizKaraktera(rhs.getID());
-		_imePrezime = GetNizKaraktera(rhs.getImePrezime());
-		_pogoci = rhs.getPogociCopy();
+		_ID = GetNizKaraktera(rhs.GetID());
+		_imePrezime = GetNizKaraktera(rhs.GetImePrezime());
+		for (const Pogodak* const pogodak : rhs._pogoci) {
+			_pogoci.push_back(new Pogodak{ *pogodak });
+		}
 
 		return *this;
 	}
 
-	const char* getImePrezime() const {
-		return _imePrezime;
-	}
-
-	const char* getID() const {
-		return _ID;
-	}
-
-	const std::vector<Pogodak*>& getPogoci() const {
-		return _pogoci;
-	}
-
-	std::vector<Pogodak*> getPogociCopy() const {
-		std::vector<Pogodak*> temp{};
-
-		for (const auto& pogodak : _pogoci) {
-			temp.push_back(new Pogodak(*pogodak));
-		}
-
-		return temp;
-	}
-
 	bool operator==(const Igrac& rhs) const {
-		return std::strcmp(getID(), rhs.getID()) == 0;
+		return std::string(GetID()) == rhs.GetID();
 	}
 
 	bool operator!=(const Igrac& rhs) const {
@@ -473,14 +447,14 @@ public:
 	}
 
 	bool operator==(const std::string& idIliImeIgraca) const {
-		return getID() == idIliImeIgraca || getImePrezime() == idIliImeIgraca;
+		return GetID() == idIliImeIgraca || GetImePrezime() == idIliImeIgraca;
 	}
 
 	bool operator!=(const std::string& idIliImeIgraca) const {
 		return !(*this == idIliImeIgraca);
 	}
 
-	bool daLiJePogodakDodan(const Pogodak& pogodakZaPronaci) {
+	bool DaLiJePogodakDodan(const Pogodak& pogodakZaPronaci) const {
 		for (const auto& pogodak : _pogoci) {
 			if (*pogodak == pogodakZaPronaci) {
 				return true;
@@ -494,22 +468,12 @@ public:
 		_pogoci.push_back(new Pogodak{ pogodak });
 	}
 
-	const Pogodak& getZadnjiPogodak() const {
+	const Pogodak& GetZadnjiPogodak() const {
 		return *_pogoci.back();
 	}
 
-	std::size_t getBrojPogodaka() const {
+	int GetBrojPogodaka() const {
 		return _pogoci.size();
-	}
-
-private:
-	void clearResources() {
-		delete[] _ID; _ID = nullptr;
-		delete[] _imePrezime; _imePrezime = nullptr;
-		for (auto& pogodak : _pogoci) {
-			delete pogodak;
-			pogodak = nullptr;
-		}
 	}
 };
 int Igrac::_id = 1;
@@ -521,34 +485,17 @@ public:
 	DrzavaTim(Drzava drzava = BOSNA_I_HERCEGOVINA) {
 		_drzava = drzava;
 	}
-	Drzava GetDrzava() { return _drzava; }
+	Drzava GetDrzava() const { return _drzava; }
 	vector<Igrac>& GetIgraci() { return _igraci; }
 
 	// Methods I added below
-	DrzavaTim(const DrzavaTim& reprezentacija) = default;
-	~DrzavaTim() = default;
 
-	DrzavaTim& operator=(const DrzavaTim& rhs) {
-		if (this == &rhs) {
-			return *this;
-		}
-
-		_drzava = rhs.getDrzava();
-		_igraci = rhs.getIgraci();
-
-		return *this;
-	}
-
-	Drzava getDrzava() const {
-		return _drzava;
-	}
-
-	const std::vector<Igrac>& getIgraci() const {
+	const std::vector<Igrac>& GetIgraci() const {
 		return _igraci;
 	}
 
-	bool daLiIgracPostojiUDrzavaTim(const Igrac& igracZaPronaci) const {
-		for (const auto& igrac : _igraci) {
+	bool DaLiIgracPostojiUDrzavaTim(const Igrac& igracZaPronaci) const {
+		for (const auto& igrac : GetIgraci()) {
 			if (igrac == igracZaPronaci) {
 				return true;
 			}
@@ -558,34 +505,34 @@ public:
 	}
 
 	void AddIgrac(const Igrac& igrac) {
-		if (daLiIgracPostojiUDrzavaTim(igrac)) {
-			throw std::runtime_error("Igrac vec dodan u reprezentaciju");
+		if (DaLiIgracPostojiUDrzavaTim(igrac)) {
+			throw std::runtime_error("Igrac vec dodan u drzava timu");
 		}
 
 		_igraci.push_back(igrac);
 	}
 
 	bool operator==(const DrzavaTim& rhs) const {
-		return getDrzava() == rhs.getDrzava()
-			&& getIgraci() == rhs.getIgraci();
+		return GetDrzava() == rhs.GetDrzava()
+			&& GetIgraci() == rhs.GetIgraci();
 	}
 
 	bool operator!=(const DrzavaTim& rhs) const {
 		return !(*this == rhs);
 	}
 
-	std::size_t getBrojPogodaka() const {
-		std::size_t sum{ 0 };
+	int GetBrojPogodaka() const {
+		int sum{ 0 };
 
-		for (const auto& igrac : _igraci) {
-			sum += igrac.getBrojPogodaka();
+		for (const auto& igrac : GetIgraci()) {
+			sum += igrac.GetBrojPogodaka();
 		}
 
 		return sum;
 	}
 
-	Igrac* getIgracByIDOrName(const std::string& idIliImeIgraca) {
-		for (auto& igrac : _igraci) {
+	Igrac* GetIgracByIDOrName(const std::string& idIliImeIgraca) {
+		for (auto& igrac : GetIgraci()) {
 			if (igrac == idIliImeIgraca) {
 				return &igrac;
 			}
@@ -594,23 +541,23 @@ public:
 		return nullptr;
 	}
 
-	std::vector<Igrac*> operator()(const std::size_t brojPogodaka) {
-		std::vector<Igrac*> temp{};
+	std::vector<Igrac*> GetIgraceSaIstimBrojemPogodaka(const int brojPogodaka) {
+		std::vector<Igrac*> igraci{};
 
-		for (auto& igrac : _igraci) {
-			if (igrac.getBrojPogodaka() == brojPogodaka) {
-				temp.push_back(&igrac);
+		for (auto& igrac : GetIgraci()) {
+			if (igrac.GetBrojPogodaka() == brojPogodaka) {
+				igraci.push_back(&igrac);
 			}
 		}
 
-		return temp;
+		return igraci;
 	}
 
-	std::vector<Igrac> getIgraciThatScores() const {
+	std::vector<Igrac> GetIgraciKojiSuDaliPogotke() const {
 		std::vector<Igrac> igraci{};
 
-		for (auto& igrac : _igraci) {
-			for (std::size_t i = 0; i < igrac.getBrojPogodaka(); ++i) {
+		for (auto& igrac : GetIgraci()) {
+			for (std::size_t i = 0; i < igrac.GetBrojPogodaka(); ++i) {
 				igraci.push_back(igrac);
 			}
 		}
@@ -627,27 +574,17 @@ public:
 	}
 
 	// Methods I added below
-	Prventstvo() = default;
-	Prventstvo(const Prventstvo& prventstvo) = default;
-	Prventstvo& operator=(const Prventstvo& rhs) = default;
-	~Prventstvo() = default;
 
-	const Kolekcija<DrzavaTim, DrzavaTim, 20>& getUtakmice() const {
-		return _utakmice;
-	}
-
-	bool daLiSuSeDrzaveTimoviVecSusreli(
-		const DrzavaTim& drzavaTim1ZaPronaci,
-		const DrzavaTim& drzavaTim2ZaPronaci
+	bool DaLiSuSeDrzaveTimoviVecSusreli(
+		const DrzavaTim& drzavaDomacegTimaZaPronaci,
+		const DrzavaTim& drzavaGostTimaZaPronaci
 	) const {
 		for (int i = 0; i < _utakmice.getTrenutno(); ++i) {
-			const DrzavaTim& drzavaTim1{ _utakmice.getElement1(i) };
-			const DrzavaTim& drzavaTim2{ _utakmice.getElement2(i) };
+			const DrzavaTim& drzavaDomacegTima{ _utakmice.getElement1(i) };
+			const DrzavaTim& drzavaGostTima{ _utakmice.getElement2(i) };
 
-			if (drzavaTim1ZaPronaci == drzavaTim1 && drzavaTim2ZaPronaci == drzavaTim2) {
-				return true;
-			}
-			else if (drzavaTim1ZaPronaci == drzavaTim2 && drzavaTim2ZaPronaci == drzavaTim1) {
+			if (drzavaDomacegTimaZaPronaci == drzavaDomacegTima 
+			 && drzavaGostTimaZaPronaci == drzavaGostTima) {
 				return true;
 			}
 		}
@@ -659,196 +596,193 @@ public:
 		const DrzavaTim& drzavaTim1,
 		const DrzavaTim& drzavaTim2
 	) {
-		if (daLiSuSeDrzaveTimoviVecSusreli(drzavaTim1, drzavaTim2)) {
+		if (DaLiSuSeDrzaveTimoviVecSusreli(drzavaTim1, drzavaTim2)) {
 			throw std::runtime_error("Drzave tim su se vec jednom susrele na ovom prvenstvu");
-		}
-		else if (drzavaTim1.getDrzava() == drzavaTim2.getDrzava()) {
-			// No point in setting a match if the countries are the same
-			return;
 		}
 
 		_utakmice.AddElement(drzavaTim1, drzavaTim2);
 	}
 
-	DrzavaTim* getDrzavaTimForDrzava(Drzava drzava) {
+	DrzavaTim* GetDrzavaTimForDrzava(Drzava drzava) {
 		for (int i = 0; i < _utakmice.getTrenutno(); ++i) {
-			DrzavaTim& drzavaTim1{ _utakmice.getElement1(i) };
-			DrzavaTim& drzavaTim2{ _utakmice.getElement2(i) };
+			DrzavaTim& drzavaTimDomacina{ _utakmice.getElement1(i) };
+			DrzavaTim& drzavaTimGosta{ _utakmice.getElement2(i) };
 
-			if (drzavaTim1.getDrzava() == drzava) {
-				return &drzavaTim1;
+			if (drzavaTimDomacina.GetDrzava() == drzava) {
+				return &drzavaTimDomacina;
 			}
-			else if (drzavaTim2.getDrzava() == drzava) {
-				return &drzavaTim2;
+			else if (drzavaTimGosta.GetDrzava() == drzava) {
+				return &drzavaTimGosta;
 			}
 		}
 
 		return nullptr;
 	}
 
-	Igrac* getIgracByIDOrNameFromDrzaveTimovi(
+	Igrac* GetIgracByIDOrNameFromDrzaveTimovi(
 		const std::string& idIliImeIgraca,
-		DrzavaTim& drzavaTim1,
-		DrzavaTim& drzavaTim2
+		DrzavaTim& drzavaTimDomacina,
+		DrzavaTim& drzavaTimGosta
 	) {
-		Igrac* igrac1{ drzavaTim1.getIgracByIDOrName(idIliImeIgraca) };
+		Igrac* igrac1{ drzavaTimDomacina.GetIgracByIDOrName(idIliImeIgraca) };
 
 		if (igrac1) {
 			return igrac1;
 		}
 
-		Igrac* igrac2{ drzavaTim2.getIgracByIDOrName(idIliImeIgraca) };
+		Igrac* igrac2{ drzavaTimGosta.GetIgracByIDOrName(idIliImeIgraca) };
 		return igrac2;
 	}
 
+	/*
+		U metodi ispod ima nadprosjecan broj predpostavki da nesto nije
+		nullptr, jer za nas testni main to nece praviti problem, za drugi
+		tho vjv hoce
+	*/
 	bool AddPogodak(
-		Drzava drzava1,
-		Drzava drzava2,
+		Drzava drzavaDomacegTima,
+		Drzava drzavaGostTima,
 		const std::string& idIliImeIgraca,
-		const Pogodak& pogodak
+		const Pogodak& pogodakZaDodat
 	) {
-		DrzavaTim* drzavaTim1{ getDrzavaTimForDrzava(drzava1) };
-		DrzavaTim* drzavaTim2{ getDrzavaTimForDrzava(drzava2) };
-
-		if (!drzavaTim1 || !drzavaTim2) {
-			return false;
-		}
-		else if (!daLiSuSeDrzaveTimoviVecSusreli(*drzavaTim1, *drzavaTim2)) {
-			return false;
-		}
+		DrzavaTim* drzavaTimDomacina{ GetDrzavaTimForDrzava(drzavaDomacegTima) };
+		DrzavaTim* drzavaTimGosta{ GetDrzavaTimForDrzava(drzavaGostTima) };
 
 		Igrac* igrac{
-			getIgracByIDOrNameFromDrzaveTimovi(idIliImeIgraca, *drzavaTim1, *drzavaTim2)
+			GetIgracByIDOrNameFromDrzaveTimovi(idIliImeIgraca, *drzavaTimDomacina, *drzavaTimGosta)
 		};
 
-		if (!igrac || igrac->daLiJePogodakDodan(pogodak)) {
+		if (!igrac || igrac->DaLiJePogodakDodan(pogodakZaDodat)) {
 			return false;
 		}
 
-		igrac->AddPogodak(pogodak);
-		sendMail(*igrac, *drzavaTim1, *drzavaTim2);
+		igrac->AddPogodak(pogodakZaDodat);
+		SendMailSvimIgracima(*igrac, *drzavaTimDomacina, *drzavaTimGosta);
 		return true;
 	}
 
-	static std::string getFormattedResultStrForDrzaveTimovi(
-		const DrzavaTim& drzavaTim1,
-		const DrzavaTim& drzavaTim2
-	) {
+	std::string GetFormattedResultStrForDrzaveTimovi(
+		const DrzavaTim& drzavaTimDomacina,
+		const DrzavaTim& drzavaTimGosta
+	) const {
 		std::string formattedResult{};
 
-		std::string drzava1Str{ getDrzavaAsStr(drzavaTim1.getDrzava()) };
-		std::string drzava1Pogoci{ '(' + std::to_string(drzavaTim1.getBrojPogodaka()) + ')' };
+		const std::string drzava1Str{ GetDrzavaAsStr(drzavaTimDomacina.GetDrzava()) };
+		const std::string drzava1Pogoci{ '(' + std::to_string(drzavaTimDomacina.GetBrojPogodaka()) + ')'  };
 
-		std::string drzava2Str{ getDrzavaAsStr(drzavaTim2.getDrzava()) };
-		std::string drzava2Pogoci{ '(' + std::to_string(drzavaTim2.getBrojPogodaka()) + ')' };
+		const std::string drzava2Str{ GetDrzavaAsStr(drzavaTimGosta.GetDrzava()) };
+		const std::string drzava2Pogoci{ '(' + std::to_string(drzavaTimGosta.GetBrojPogodaka()) + ')' };
 
 		formattedResult += drzava1Str;
 		formattedResult += " : ";
 		formattedResult += drzava2Str;
 		formattedResult += '\n';
 
-		formattedResult += addFrontBackPaddingToText(drzava1Pogoci, drzava1Str.size());
+		formattedResult += AddFrontAndBackPaddingToStr(drzava1Pogoci, drzava1Str.size());
 		formattedResult += "   ";
-		formattedResult += addFrontBackPaddingToText(drzava2Pogoci, drzava2Str.size());
+		formattedResult += AddFrontAndBackPaddingToStr(drzava2Pogoci, drzava2Str.size());
 
 		return formattedResult;
 	}
 
-	static std::string getPlayersWhoScoredGoalsSideBySide(
-		const std::vector<Igrac>& igraci1,
-		const std::vector<Igrac>& igraci2
-	) {
-		std::string playerNamesSideBySide{};
-
-		std::size_t igrac1Index{ 0 };
-		std::size_t igrac2Index{ 0 };
-		bool anyIgraci1Left{ igrac1Index < igraci1.size() };
-		bool anyIgraci2Left{ igrac2Index < igraci2.size() };
-
-		while (anyIgraci1Left || anyIgraci2Left) {
-			if (anyIgraci1Left) {
-				playerNamesSideBySide += igraci1[igrac1Index].getImePrezime();
-				++igrac1Index;
-			}
-
-			if (anyIgraci2Left) {
-				playerNamesSideBySide += ((anyIgraci1Left) ? "\t" : "\t\t");
-				playerNamesSideBySide += igraci2[igrac2Index].getImePrezime();
-				++igrac2Index;
-			}
-
-			playerNamesSideBySide += '\n';
-
-			anyIgraci1Left = igrac1Index < igraci1.size();
-			anyIgraci2Left = igrac2Index < igraci2.size();
-		}
-
-		if (!playerNamesSideBySide.empty()) {
-			playerNamesSideBySide.pop_back();
-		}
-
-		return playerNamesSideBySide;
-	}
-
 	friend std::ostream& operator<<(std::ostream& os, const Prventstvo& prventstvo) {
-		const auto& utakmice{ prventstvo.getUtakmice() };
+		const auto& utakmice{ prventstvo._utakmice };
 
 		for (int i = 0; i < utakmice.getTrenutno(); ++i) {
-			const DrzavaTim& drzavaTim1{ utakmice.getElement1(i) };
-			const DrzavaTim& drzavaTim2{ utakmice.getElement2(i) };
+			const DrzavaTim& drzavaTimDomacina{ utakmice.getElement1(i) };
+			const DrzavaTim& drzavaTimGosta{ utakmice.getElement2(i) };
+
+			const std::vector<Igrac> igraciDomacini{ drzavaTimDomacina.GetIgraciKojiSuDaliPogotke() };
+			const std::vector<Igrac> igraciGosta{ drzavaTimGosta.GetIgraciKojiSuDaliPogotke() };
+			int maksSize = std::max(igraciDomacini.size(), igraciGosta.size());
 
 			os << crt;
-			os << Prventstvo::getFormattedResultStrForDrzaveTimovi(drzavaTim1, drzavaTim2);
+			os << prventstvo.GetFormattedResultStrForDrzaveTimovi(drzavaTimDomacina, drzavaTimGosta);
 			os << crt;
 
-			os << Prventstvo::getPlayersWhoScoredGoalsSideBySide(drzavaTim1.getIgraciThatScores(), drzavaTim2.getIgraciThatScores());
+			for (int i = 0; i < maksSize; ++i) {
+				if (i < igraciDomacini.size()) {
+					os << igraciDomacini[i].GetImePrezime();
+				}
+				os << ' ';
+				if (i < igraciGosta.size()) {
+					os << igraciGosta[i].GetImePrezime();
+				}
+				if (i + 1 != maksSize) {
+					os << '\n';
+				}
+			}
+			
 			os << crt;
 		}
 
 		return os;
 	}
 
-	std::vector<Igrac*> operator()(const std::size_t brojPogodaka) {
-		std::vector<Igrac*> temp{};
+	std::vector<Igrac*> operator()(const int brojPogodaka) {
+		std::vector<Igrac*> igraci{};
 
 		for (int i = 0; i < _utakmice.getTrenutno(); ++i) {
-			DrzavaTim& drzavaTim1{ _utakmice.getElement1(i) };
-			DrzavaTim& drzavaTim2{ _utakmice.getElement2(i) };
+			DrzavaTim& drzavaTimDomacina{ _utakmice.getElement1(i) };
+			DrzavaTim& drzavaTimGosta{ _utakmice.getElement2(i) };
 
-			auto igraciDrzaveTim1{ drzavaTim1(brojPogodaka) };
-			auto igraciDrzaveTim2{ drzavaTim2(brojPogodaka) };
+			auto igraciDrzaveTim1{ drzavaTimDomacina.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) };
+			auto igraciDrzaveTim2{ drzavaTimGosta.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) };
 
 			for (const auto& igrac : igraciDrzaveTim1) {
-				temp.push_back(igrac);
+				igraci.push_back(igrac);
 			}
 
 			for (const auto& igrac : igraciDrzaveTim2) {
-				temp.push_back(igrac);
+				igraci.push_back(igrac);
 			}
 		}
 
-		return temp;
+		return igraci;
 	}
 
-private:
-	void sendMail(
-		const Igrac& igrac,
-		const DrzavaTim& drzavaTim1,
-		const DrzavaTim& drzavaTim2
+	void SendMailSvimIgracima(
+		const Igrac& igracKojiJeDaoGo,
+		const DrzavaTim& drzavaTimDomacina,
+		const DrzavaTim& drzavaTimGosta
+	) const {
+		for (const auto& igrac : drzavaTimDomacina.GetIgraci()) {
+			SendMail(
+				igrac, 
+				igracKojiJeDaoGo, 
+				drzavaTimDomacina, 
+				drzavaTimGosta
+			);
+		}
+		for (const auto& igrac : drzavaTimGosta.GetIgraci()) {
+			SendMail(
+				igrac, 
+				igracKojiJeDaoGo, 
+				drzavaTimDomacina, 
+				drzavaTimGosta
+			);
+		}
+	}
+
+	void SendMail(
+		const Igrac& igracKojemSeSaljeMail,
+		const Igrac& igracKojiJeDaoGo,
+		const DrzavaTim& drzavaTimDomacina,
+		const DrzavaTim& drzavaTimGosta
 	) const {
 		std::thread emailThread{
 			[&]() {
-				// DON'T FORGET TO UNCOMMENT THIS LINE BELOW
 				std::this_thread::sleep_for(2s);
-				std::cout << "\nTo: " << igrac.getID() << "@euro2024.com\n";
+				std::cout << "\nTo: " << igracKojemSeSaljeMail.GetID() << "@euro2024.com\n";
 				std::cout << "From: info@euro2024.com\n";
 				std::cout << "Subject: Informacija\n";
 				std::cout << "Postovani,\n";
-				std::cout << "U " << igrac.getZadnjiPogodak().getVrijemePogotka() << " sati igrac " << igrac.getImePrezime();
-				std::cout << " je zabiljezio svoj " << igrac.getBrojPogodaka() << '\n';
+				std::cout << "U " << igracKojiJeDaoGo.GetZadnjiPogodak().GetVrijemePogotka();
+				std::cout << " sati igrac " << igracKojiJeDaoGo.GetImePrezime();
+				std::cout << " je zabiljezio svoj " << igracKojiJeDaoGo.GetBrojPogodaka() << '\n';
 				std::cout << "pogodak na ovoj utakmici.\n";
 				std::cout << "Trenutni rezultat je:\n";
-				std::cout << Prventstvo::getFormattedResultStrForDrzaveTimovi(drzavaTim1, drzavaTim2);
+				std::cout << GetFormattedResultStrForDrzaveTimovi(drzavaTimDomacina, drzavaTimGosta);
 				std::cout << "\nPuno srece u nastavku susreta.\n\n";
 			}
 		};

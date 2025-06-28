@@ -4,7 +4,7 @@ Za ovu grupu postavka je postavljena na [github account od profesora](https://gi
 
 Enumeracija -> Drzava { ENGLESKA, SPANIJA, HOLANDIJA, FRANCUSKA, BOSNA_I_HERCEGOVINA }<br>
 Kolekcija tip staticki niz (T[max])<br>
-Threads, lambdas, string, vektor, regex<br>
+Threads, lambdas, string, vector, regex<br>
 
 # Grupa 2 (G2) 
 
@@ -12,4 +12,4 @@ Ovaj ispitni sam sastavio na osnovu "word of mouth" drugih studenata, pa ako ima
 
 Enumeracija -> Drzava { ENGLESKA, SPANIJA, HOLANDIJA, FRANCUSKA, BOSNA_I_HERCEGOVINA }<br>
 Kolekcija tip staticki niz (T[max])<br>
-Threads, lambdas, string, vektor, regex<br>
+Threads, lambdas, string, vector, regex<br>

@@ -4,6 +4,6 @@ Za ovu grupu postavka je postavljena na [github account od profesora](https://gi
 
 Enumeracija -> Drzava { ENGLESKA, SPANIJA, HOLANDIJA, FRANCUSKA, BOSNA_I_HERCEGOVINA }<br>
 Kolekcija tip staticki niz pokazivaca (T*[max])<br>
-Threads, lambdas, string, vektor, regex<br>
+Threads, lambdas, string, vector, regex<br>
 
 # Grupa 2 (G2)

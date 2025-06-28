@@ -103,7 +103,7 @@ bool ValidirajID(const std::string& id) {
 	std::regex threeDigitIDPattern{ "ID#0-[1-9]\\d{2}" };
 	std::regex fourDigitIDPattern{ "ID#[1-9]\\d{3}" };
 
-	return std::regex_match(id, oneDigitIDPattern) 
+	return std::regex_match(id, oneDigitIDPattern)
 		|| std::regex_match(id, twoDigitIDPattern)
 		|| std::regex_match(id, threeDigitIDPattern)
 		|| std::regex_match(id, fourDigitIDPattern);
@@ -160,7 +160,7 @@ public:
 		}
 		delete _trenutno; _trenutno = nullptr;
 
-	_trenutno = new int{ rhs.getTrenutno() };
+		_trenutno = new int{ rhs.getTrenutno() };
 		for (int i = 0; i < getTrenutno(); ++i) {
 			_elementi1[i] = new T1{ rhs.getElement1(i) };
 			_elementi2[i] = new T2{ rhs.getElement2(i) };
@@ -241,7 +241,8 @@ public:
 		: _sat{ new int{ vrijeme.getSat() } }
 		, _minuta{ new int{ vrijeme.getMinuta() } }
 		, _sekunda{ new int{ vrijeme.getSekunda() } }
-	{}
+	{
+	}
 
 	Vrijeme& operator=(const Vrijeme& rhs) {
 		*_sat = rhs.getSat();
@@ -446,7 +447,7 @@ public:
 	vector<Igrac>& GetIgraci() { return _igraci; }
 
 	// Methods I added below
-	
+
 	const std::vector<Igrac>& GetIgraci() const { return _igraci; }
 
 	bool DaLiIgracPostojiUReprezentaciji(const Igrac& igracZaPronaci) const {
@@ -621,7 +622,7 @@ public:
 		for (int i = 0; i < utakmice.getTrenutno(); ++i) {
 			const Reprezentacija& repDomacin{ utakmice.getElement1(i) };
 			const Reprezentacija& repGost{ utakmice.getElement2(i) };
-			
+
 			const std::vector<Igrac> igraciDomacini{ repDomacin.GetIgraciKojiSuDaliPogotke() };
 			const std::vector<Igrac> igraciGosta{ repGost.GetIgraciKojiSuDaliPogotke() };
 			int maksSize = std::max(igraciDomacini.size(), igraciGosta.size());
@@ -658,15 +659,15 @@ public:
 			Reprezentacija& repDomacin{ _utakmice.getElement1(i) };
 			Reprezentacija& repGost{ _utakmice.getElement2(i) };
 
-			const auto igraciReprezentacije1{ repDomacin.GetIgraciSaPogotcimaUIntervalu(start, end) };
-			const auto igraciReprezentacije2{ repGost.GetIgraciSaPogotcimaUIntervalu(start, end) };
+			const auto igraciRepDomacin{ repDomacin.GetIgraciSaPogotcimaUIntervalu(start, end) };
+			const auto igraciRepGost{ repGost.GetIgraciSaPogotcimaUIntervalu(start, end) };
 
-			for (const auto& igrac : igraciReprezentacije1) {
-				igraciSaPogotcimaUIntervalu.push_back(igrac);
+			for (const auto& igracDomacin : igraciRepDomacin) {
+				igraciSaPogotcimaUIntervalu.push_back(igracDomacin);
 			}
 
-			for (const auto& igrac : igraciReprezentacije2) {
-				igraciSaPogotcimaUIntervalu.push_back(igrac);
+			for (const auto& igracGost : igraciRepGost) {
+				igraciSaPogotcimaUIntervalu.push_back(igracGost);
 			}
 		}
 
@@ -675,7 +676,7 @@ public:
 
 	void SendMailSvimIgracima(
 		const Igrac& igracKojiJeDaoGo,
-		const Reprezentacija& repDomacin, 
+		const Reprezentacija& repDomacin,
 		const Reprezentacija& repGost
 	) const {
 		for (const auto& igrac : repDomacin.GetIgraci()) {

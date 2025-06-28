@@ -624,14 +624,15 @@ public:
 		DrzavaTim& drzavaTimDomacina,
 		DrzavaTim& drzavaTimGosta
 	) {
-		Igrac* igrac1{ drzavaTimDomacina.GetIgracByIDOrName(idIliImeIgraca) };
+		Igrac* igracDomacin{ drzavaTimDomacina.GetIgracByIDOrName(idIliImeIgraca) };
 
-		if (igrac1) {
-			return igrac1;
+		if (igracDomacin) {
+			return igracDomacin;
 		}
 
-		Igrac* igrac2{ drzavaTimGosta.GetIgracByIDOrName(idIliImeIgraca) };
-		return igrac2;
+		Igrac* igracGost{ drzavaTimGosta.GetIgracByIDOrName(idIliImeIgraca) };
+
+		return igracGost;
 	}
 
 	/*
@@ -648,16 +649,16 @@ public:
 		DrzavaTim* drzavaTimDomacina{ GetDrzavaTimForDrzava(drzavaDomacegTima) };
 		DrzavaTim* drzavaTimGosta{ GetDrzavaTimForDrzava(drzavaGostTima) };
 
-		Igrac* igrac{
+		Igrac* igracKojiJeDaoGo{
 			GetIgracByIDOrNameFromDrzaveTimovi(idIliImeIgraca, *drzavaTimDomacina, *drzavaTimGosta)
 		};
 
-		if (!igrac || igrac->DaLiJePogodakDodan(pogodakZaDodat)) {
+		if (igracKojiJeDaoGo->DaLiJePogodakDodan(pogodakZaDodat)) {
 			return false;
 		}
 
-		igrac->AddPogodak(pogodakZaDodat);
-		SendMailSvimIgracima(*igrac, *drzavaTimDomacina, *drzavaTimGosta);
+		igracKojiJeDaoGo->AddPogodak(pogodakZaDodat);
+		SendMailSvimIgracima(*igracKojiJeDaoGo, *drzavaTimDomacina, *drzavaTimGosta);
 		return true;
 	}
 
@@ -726,15 +727,19 @@ public:
 			DrzavaTim& drzavaTimDomacina{ _utakmice.getElement1(i) };
 			DrzavaTim& drzavaTimGosta{ _utakmice.getElement2(i) };
 
-			auto igraciDrzaveTim1{ drzavaTimDomacina.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) };
-			auto igraciDrzaveTim2{ drzavaTimGosta.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) };
+			auto igraciDrzaveTimDomacin{ 
+				drzavaTimDomacina.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) 
+			};
+			auto igraciDrzaveTimGost{ 
+				drzavaTimGosta.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) 
+			};
 
-			for (const auto& igrac : igraciDrzaveTim1) {
-				igraci.push_back(igrac);
+			for (const auto& igracDomacin : igraciDrzaveTimDomacin) {
+				igraci.push_back(igracDomacin);
 			}
 
-			for (const auto& igrac : igraciDrzaveTim2) {
-				igraci.push_back(igrac);
+			for (const auto& igracGost : igraciDrzaveTimGost) {
+				igraci.push_back(igracGost);
 			}
 		}
 
@@ -746,17 +751,17 @@ public:
 		const DrzavaTim& drzavaTimDomacina,
 		const DrzavaTim& drzavaTimGosta
 	) const {
-		for (const auto& igrac : drzavaTimDomacina.GetIgraci()) {
+		for (const auto& igracDomacin : drzavaTimDomacina.GetIgraci()) {
 			SendMail(
-				igrac, 
+				igracDomacin,
 				igracKojiJeDaoGo, 
 				drzavaTimDomacina, 
 				drzavaTimGosta
 			);
 		}
-		for (const auto& igrac : drzavaTimGosta.GetIgraci()) {
+		for (const auto& igracGost : drzavaTimGosta.GetIgraci()) {
 			SendMail(
-				igrac, 
+				igracGost,
 				igracKojiJeDaoGo, 
 				drzavaTimDomacina, 
 				drzavaTimGosta

@@ -577,20 +577,21 @@ public:
 
 		return nullptr;
 	}
-
+		
 	Igrac* GetIgracByIDOrNameFromReprezentacije(
 		const std::string& idIliImeIgraca,
 		Reprezentacija& repDomacin,
 		Reprezentacija& repGost
 	) {
-		Igrac* igrac1{ repDomacin.GetIgracByIDOrName(idIliImeIgraca) };
+		Igrac* igracDomacin{ repDomacin.GetIgracByIDOrName(idIliImeIgraca) };
 
-		if (igrac1) {
-			return igrac1;
+		if (igracDomacin) {
+			return igracDomacin;
 		}
 
-		Igrac* igrac2{ repGost.GetIgracByIDOrName(idIliImeIgraca) };
-		return igrac2;
+		Igrac* igracGost{ repGost.GetIgracByIDOrName(idIliImeIgraca) };
+
+		return igracGost;
 	}
 
 	/*
@@ -607,16 +608,16 @@ public:
 		Reprezentacija* repDomacin{ GetReprezentacijaForDrzava(drzavaDomacina) };
 		Reprezentacija* repGosta{ GetReprezentacijaForDrzava(drzavaGosta) };
 
-		Igrac* igrac{
+		Igrac* igracKojiJeDaoGo{
 			GetIgracByIDOrNameFromReprezentacije(idIliImeIgraca, *repDomacin, *repGosta)
 		};
 
-		if (igrac->DaLiJePogodakDodan(pogodakZaDodat)) {
+		if (igracKojiJeDaoGo->DaLiJePogodakDodan(pogodakZaDodat)) {
 			return false;
 		}
 
-		igrac->AddPogodak(pogodakZaDodat);
-		SendMailSvimIgracima(*igrac, *repDomacin, *repGosta);
+		igracKojiJeDaoGo->AddPogodak(pogodakZaDodat);
+		SendMailSvimIgracima(*igracKojiJeDaoGo, *repDomacin, *repGosta);
 		return true;
 	}
 
@@ -683,11 +684,11 @@ public:
 		const Reprezentacija& repDomacin,
 		const Reprezentacija& repGost
 	) const {
-		for (const auto& igrac : repDomacin.GetIgraci()) {
-			SendMail(igrac, igracKojiJeDaoGo, repDomacin, repGost);
+		for (const auto& igracDomacin : repDomacin.GetIgraci()) {
+			SendMail(igracDomacin, igracKojiJeDaoGo, repDomacin, repGost);
 		}
-		for (const auto& igrac : repGost.GetIgraci()) {
-			SendMail(igrac, igracKojiJeDaoGo, repDomacin, repGost);
+		for (const auto& igracGost : repGost.GetIgraci()) {
+			SendMail(igracGost, igracKojiJeDaoGo, repDomacin, repGost);
 		}
 	}
 

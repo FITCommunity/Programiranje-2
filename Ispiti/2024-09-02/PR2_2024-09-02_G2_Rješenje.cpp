@@ -727,15 +727,19 @@ public:
 			DrzavaTim& drzavaTimDomacina{ _utakmice.getElement1(i) };
 			DrzavaTim& drzavaTimGosta{ _utakmice.getElement2(i) };
 
-			auto igraciDrzaveTim1{ drzavaTimDomacina.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) };
-			auto igraciDrzaveTim2{ drzavaTimGosta.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) };
+			auto igraciDrzaveTimDomacin{ 
+				drzavaTimDomacina.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) 
+			};
+			auto igraciDrzaveTimGost{ 
+				drzavaTimGosta.GetIgraceSaIstimBrojemPogodaka(brojPogodaka) 
+			};
 
-			for (const auto& igrac : igraciDrzaveTim1) {
-				igraci.push_back(igrac);
+			for (const auto& igracDomacin : igraciDrzaveTimDomacin) {
+				igraci.push_back(igracDomacin);
 			}
 
-			for (const auto& igrac : igraciDrzaveTim2) {
-				igraci.push_back(igrac);
+			for (const auto& igracGost : igraciDrzaveTimGost) {
+				igraci.push_back(igracGost);
 			}
 		}
 

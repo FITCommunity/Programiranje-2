@@ -109,7 +109,7 @@ char* GenerisiID(const std::string& fullName, const int num) {
 
 	const int surnameInitialPos = fullName.find(' ') + 1;
 	ID += std::toupper(fullName[surnameInitialPos]);
-	
+
 	ID += std::to_string(reverseNum);
 
 	return GetNizKaraktera(ID.c_str());
@@ -245,7 +245,8 @@ public:
 		: _sat{ new int{ vrijeme.getSat() } }
 		, _minuta{ new int{ vrijeme.getMinuta() } }
 		, _sekunda{ new int{ vrijeme.getSekunda() } }
-	{}
+	{
+	}
 
 	Vrijeme& operator=(const Vrijeme& rhs) {
 		*_sat = rhs.getSat();
@@ -383,7 +384,7 @@ public:
 		if (this == &rhs) {
 			return *this;
 		}
-		
+
 		delete[] _ID; _ID = nullptr;
 		delete[] _imePrezime; _imePrezime = nullptr;
 		for (size_t i = 0; i < _pogoci.size(); i++) {
@@ -454,7 +455,7 @@ public:
 	// Methods I added below
 
 	const std::vector<Igrac>& GetIgraci() const { return _igraci; }
-	
+
 	bool DaLiIgracPostojiUReprezentaciji(const Igrac& igracZaPronaci) const {
 		for (const auto& igrac : GetIgraci()) {
 			if (igrac == igracZaPronaci) {
@@ -577,7 +578,7 @@ public:
 
 		return nullptr;
 	}
-		
+
 	Igrac* GetIgracByIDOrNameFromReprezentacije(
 		const std::string& idIliImeIgraca,
 		Reprezentacija& repDomacin,
@@ -664,15 +665,19 @@ public:
 			Reprezentacija& repDomacin{ _utakmice.getElement1(i) };
 			Reprezentacija& repGost{ _utakmice.getElement2(i) };
 
-			auto igraciReprezentacije1{ repDomacin.GetIgraceSaIstimIliVecimBrojemPogodaka(brojPogodaka) };
-			auto igraciReprezentacije2{ repGost.GetIgraceSaIstimIliVecimBrojemPogodaka(brojPogodaka) };
+			auto igraciRepDomacin{
+				repDomacin.GetIgraceSaIstimIliVecimBrojemPogodaka(brojPogodaka)
+			};
+			auto igraciRepGost{
+				repGost.GetIgraceSaIstimIliVecimBrojemPogodaka(brojPogodaka)
+			};
 
-			for (const auto& igrac : igraciReprezentacije1) {
-				igraci.push_back(igrac);
+			for (const auto& igracDomacin : igraciRepDomacin) {
+				igraci.push_back(igracDomacin);
 			}
 
-			for (const auto& igrac : igraciReprezentacije2) {
-				igraci.push_back(igrac);
+			for (const auto& igracGost : igraciRepGost) {
+				igraci.push_back(igracGost);
 			}
 		}
 

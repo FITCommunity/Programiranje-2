@@ -4,7 +4,8 @@
 	Ja nisam izlazio na ovaj rok, samo sam prikupio odredene informacije kroz pricu
 	drugih studenata i slika koje su nekako uslikane tokom ispita. Moguce je da postoji
 	mnogo vise razlicitih stvari nego sto sam naveo ovdje.
-	Teoretska pitanja sam obrisao jer o njima nisam cuo nista.
+
+	Teoretska pitanja sam postavio na osnovu onoga sto sam cuo.
 */
 
 #include <iostream>
@@ -143,8 +144,21 @@ public:
 	}
 };
 
+const char* GetOdgovorNaPrvoPitanje() {
+	cout << "Pitanje -> Objasnite tipove nasljedivanja \n";
+	return "Odgovor -> OVDJE UNESITE VAS ODGOVOR";
+}
+const char* GetOdgovorNaDrugoPitanje() {
+	cout << "Pitanje -> Objasnite lambda funkcije? \n";
+	return "Odgovor -> OVDJE UNESITE VAS ODGOVOR";
+}
+
 void main() {
 	cout << PORUKA;
+	cin.get();
+	cout << GetOdgovorNaPrvoPitanje() << endl;
+	cin.get();
+	cout << GetOdgovorNaDrugoPitanje() << endl;
 	cin.get();
 	/*
 	Globalna funkcija GenerisiID vraca ID igraca na osnovu vrijednosti
@@ -200,9 +214,9 @@ void main() {
 	metoda treba baciti izuzetak. Na kraju, metoda treba da vrati
    pokazivac na novi objekat tipa kolekcija koji sadrzi samo uklonjene
    elemente*/
-	
-	// Not the professor here, ovdje ne treba vratiti pokazivac, 
-	// to je izgleda greska tokom pravljenja postavke za ispit ostala
+
+   // Not the professor here, ovdje ne treba vratiti pokazivac, 
+   // to je izgleda greska tokom pravljenja postavke za ispit ostala
 	Kolekcija<int, int, 10> kolekcija3 = kolekcija1.RemoveRange(1, 3);
 	cout << kolekcija3 << endl;
 	cout << kolekcija1 << crt;
@@ -296,7 +310,7 @@ void main() {
 	vector<Igrac*> igraci = euro2024(2);
 	for (size_t i = 0; i < igraci.size(); i++)
 		cout << igraci[i]->GetImePrezime() << endl;
-	
+
 	cin.get();
 	system("pause>0");
 }

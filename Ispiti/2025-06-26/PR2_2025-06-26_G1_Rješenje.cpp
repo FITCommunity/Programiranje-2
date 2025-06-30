@@ -731,8 +731,24 @@ public:
 	}
 };
 
+const char* GetOdgovorNaPrvoPitanje() {
+	cout << "Pitanje -> Objasnite tipove nasljedivanja \n";
+	return "Odgovor -> Jednostruko nasljedivanje gdje jedna klasa direktno naslijeduje od jedne druge klase. Visestruko nasljedivanje gdje jedna klasa direktno naslijeduje od dvije ili vise klasa.";
+}
+const char* GetOdgovorNaDrugoPitanje() {
+	cout << "Pitanje -> Objasnite lambda funkcije? \n";
+	return "Odgovor -> Lambda funkcije, takoder zvane 'anonimne funkcije', su objekti cije su klase kreirane tokom compile time-a sa preklopljenim operatorom (), zbog cega se mogu pozivati kao obicne funkcije. Osnovna sintaksa sastoji se od 3 dijela: [](){}\n"
+		"[] - capture clause, gdje se mogu navesti varijable koje ce lambda spasiti kao svoje stanje\n"
+		"() - lista parametara lambde\n"
+		"{} - tijelo lambde\n";
+}
+
 void main() {
 	cout << PORUKA;
+	cin.get();
+	cout << GetOdgovorNaPrvoPitanje() << endl;
+	cin.get();
+	cout << GetOdgovorNaDrugoPitanje() << endl;
 	cin.get();
 	/*
 	Globalna funkcija GenerisiID vraca ID igraca na osnovu vrijednosti

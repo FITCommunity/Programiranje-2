@@ -4,7 +4,6 @@
 	Ja nisam izlazio na ovaj rok, samo sam prikupio odredene informacije kroz pricu
 	drugih studenata i slika koje su nekako uslikane tokom ispita. Moguce je da postoji
 	mnogo vise razlicitih stvari nego sto sam naveo ovdje.
-	Teoretska pitanja sam obrisao jer o njima nisam cuo nista.
 
 	U slucaju da se ne podrazumijeva, na ispitu se ne daju (at least as of writing this)
 	ikakvi dodatni bodovi za "optimizovan kod", takoder ne oduzimaju bodovi (u ovom ispitu)

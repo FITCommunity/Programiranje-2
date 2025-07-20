@@ -1,0 +1,36 @@
+Nisam izbacivao duplikate ili slicna pitanja. Pitanja su poredana od 2025 do 2020.
+
+Pojasnite razliku između virtualnih i cistih virtualnih metoda, te korelaciju virtualnih metoda sa polimorfizmom (navesti kratki primjer) ? 
+Pojasniti razliku izmedju konstruktora kopije i move konstruktora, razlike u implementaciji, te navesti primjere implicitnog i eksplicitnog poziva ?
+Objasnite tipove nasljedivanja
+Objasnite lambda funkcije? 
+Pojasnite kljucnu rijec virtual?
+Pojasnite function tip podatka?
+Pojasnite osnovne preduslove koji moraju biti ispunjeni da bi se realizovao polimorfizam(navesti kratki primjer) ? 
+Pojasnite razloge koristenja kljucnih rijeci abstract i ciste virtualne metode, te razlike izmedju njih ? 
+Pojasnite osnovne preduslove koji moraju biti ispunjeni da bi se realizovao polimorfizam(navesti kratki primjer) ?
+Pojasnite razloge koristenja kljucnih rijeci abstract i ciste virtualne metode, te razlike izmedju njih ?
+Pojasnite pojam reprezentacije tipa podatka?
+Navedite i ukratko opisite ulogu ios modova koji se koriste pri rada sa fajlovima?
+Pojasnite STACK i HEAP dio memorije, za šta su namijenjeni, te na koji način se trebaju koristiti (prednosti i nedostaci pojedinih slučajeva).
+Pojasnite preduslove za realizaciju polimorfizma, te koje su prednosti njegovog korištenja?
+Nabrojite i ukratko pojasnite osnovne razlike izmedju list i vector klase?
+Pojasnite opcije vezane za preslikavanje (vrijednosti, referenci, dostupnost) parametara prilikom koristenja lambda funkcija?
+Pojasnite osnovne preduslove koji moraju biti ispunjeni da bi se realizovao polimorfizam?
+Pojasnite razloge koristenja kljucnih rijeci abstract i ciste virtualne metode, te razlike izmedju njih?
+Nabrojite i ukratko pojasnite osnovne ios modove koji se koriste u radu sa fajlovima?
+Pojasnite prednosti i nedostatke visestrukog nasljedjivaja, te ulogu virtualnog nasljedjivanja u tom kontekstu?
+Pojasnite ulogu operatora reinterpret_cast.
+Ukratko opisite znacaj i vrste pametnih pokazivaca.
+Pojasnite ulogu operatora const_cast?
+Ukratko opisite redoslijed kreiranja objekta bazne klase u slucaju visestrukog nasljedjivanja(prilikom instanciranja objekta najizvedenije klase), te koja su moguca rjesenja najznacajnijih problema ubtom kontekstu ?
+Pojasnite ulogu i nacin koristenja generickog tipa future<>
+Ukratko opisite na koji nacin se moze izbjeci pojavljivanje vise podobjekata bazne klase u slucaju visestrukog nasljedjivanja?
+Za sta se koriste modovi ios::ate i ios::trunc ?
+Pojasniti ulogu i nacin koristenja iteratora?
+Pojasnite na koji nacin tip nasljedjivanja (javno, zasticeno, privatno) utjece na dostupnost atributa bazne klase unutar izvedene klase?
+Ukratko pojasnite primjenu funkcija seekg i tellg?
+Pojasnite ulogu operatora reinterpret_cast.
+Ukratko opisite znacaj i vrste pametnih pokazivaca.
+Na sta se odnosi pojam reprezentacije tipa?
+Na koji nacin se moze izbjeci pojavljivanje vise podobjekata bazne klase u slucaju visestrukog nasljedjivanja?

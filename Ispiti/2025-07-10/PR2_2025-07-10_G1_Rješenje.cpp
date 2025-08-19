@@ -176,11 +176,11 @@ public:
 	}
 
 	KolekcijaG1* RemoveRange(const int pocetak, const int brojElemenataZaObrisat) {
-		if (getTrenutno() < brojElemenataZaObrisat) {
-			throw std::exception("Broj elemenata za obrisat je veci od trenutnog broja elemenata kolekcije");
-		}
-
 		const int kraj = pocetak + brojElemenataZaObrisat - 1;
+
+		if (pocetak < 0 || kraj >= getTrenutno()) {
+			throw std::exception("Nevalidan pocetni indeks i/ili broj elemenata za obrisati");
+		}
 
 		KolekcijaG1* obrisaniElementi = new KolekcijaG1;
 		KolekcijaG1 sacuvaniElementi;

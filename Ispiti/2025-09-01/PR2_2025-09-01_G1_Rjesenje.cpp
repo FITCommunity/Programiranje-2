@@ -509,6 +509,13 @@ public:
 	vector<Kupac>& GetKupci() { return _kupci; }
 
 	void DodajKupca(Kupac k) {
+	for (int i = 0; i < _kupci.size(); i++)
+	{
+		if (strcmp(_kupci.at(i).GetImePrezime(), k.GetImePrezime() )==0)
+		{
+			throw exception("Kupac je vec dodan");
+		}
+	}
 	_kupci.push_back(k);
 }
 

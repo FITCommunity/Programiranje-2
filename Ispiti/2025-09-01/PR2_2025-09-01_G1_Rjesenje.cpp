@@ -508,14 +508,9 @@ public:
 	const char* GetNaziv() const { return _naziv; }
 	vector<Kupac>& GetKupci() { return _kupci; }
 
-	void DodajKupca(const Kupac& kupac) {
-		for (size_t i = 0; i < _kupci.size(); i++)
-		{
-			if (_kupci[i] == kupac)
-				throw exception("Kupac vec dodan!\n");
-		}
-		_kupci.push_back(kupac);
-	}
+	void DodajKupca(Kupac k) {
+	_kupci.push_back(k);
+}
 
 	bool RegistrujTransakcijuKupcu(const char* sifra, Transakcija& transakcija) {
 		for (size_t i = 0; i < _kupci.size(); i++)

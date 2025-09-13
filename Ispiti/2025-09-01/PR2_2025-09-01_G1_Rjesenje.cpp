@@ -434,52 +434,65 @@ public:
 	// DodajTransakciju - oneomguciti dupliranje transakcija sa istim vremenom, kod kupovine onemoguciti
 	// dupliranje proizvoda, a povrat omoguciti samo ako je proizvod kupljen.
 	// U zavisnosti od rezultata izvrsenja metoda vraca true ili false 
-	bool DodajTransakciju(Transakcija& transakcija) {
-		Kupovina* kupovina = dynamic_cast<Kupovina*>(&transakcija);
-		Povrat* povrat = dynamic_cast<Povrat*>(&transakcija);
-		bool zastavicaPovrat = false;
-		for (size_t i = 0; i < _transakcije.size(); i++)
-		{
-			//1. Provjera istog vremena za transakcije
-			if (transakcija.GetVrijemeRealizacije() == _transakcije[i]->GetVrijemeRealizacije())
-				return false;
-		}
-		for (size_t j = 0; j < _transakcije.size(); j++)
-		{
-			Kupovina* kupovinaVectora = dynamic_cast<Kupovina*>(_transakcije[j]);
+	
+bool DodajTransakciju(Transakcija& t) { //update koda sa funkcijom koja radi ispravno do kraja
+    Kupovina* kupovina = dynamic_cast<Kupovina*>(&t);
+    Povrat* povrat = dynamic_cast<Povrat*>(&t);
 
-			if (kupovinaVectora != nullptr && kupovina != nullptr) {
-				//2. Provjera dupliranja proizvoda za kupovine
-				if (kupovina->GetProizvodi() == kupovinaVectora->GetProizvodi())
-					return false;
-			}
+    // 1) Zabrani duplikate transakcija istog tipa u isto vrijeme
+    for (int i = 0; i < _transakcije.size(); i++) {
+        if (_transakcije[i]->GetVrijemeRealizacije() == t.GetVrijemeRealizacije()) {
+            if ((kupovina != nullptr && dynamic_cast<Kupovina*>(_transakcije[i]) != nullptr) ||
+                (povrat != nullptr && dynamic_cast<Povrat*>(_transakcije[i]) != nullptr)) {
+                return false;
+            }
+        }
+    }
 
-			//3. Provjera ima li proizvoda za povrat
-			if (kupovinaVectora != nullptr && povrat != nullptr) {
-				for (size_t k = 0; k < kupovinaVectora->GetProizvodi().size(); k++)
-				{
-					//.back() je koristeno sa pretpostavkom da za jednu transakciju tipa povrat ima samo jedan proizvod (kako je u mainu),
-					//u suprotnom, potrebna je druga implementacija
-					if (povrat->GetProizvodi().back() == kupovinaVectora->GetProizvodi()[k]) {
-						_transakcije.push_back(new Povrat(*povrat));
-						return true;
-					}
-				}
-			}
-		}
-		if (kupovina != nullptr) {
-			_transakcije.push_back(new Kupovina(*kupovina));
-			return true;
-		}
-		return false;
-	}
+    // 2) Ako je kupovina, provjeri da li je proizvod već ranije kupljen od ovog kupca
+    if (kupovina != nullptr) {
+        const vector<Proizvod>& noviProizvodi = kupovina->GetProizvodi();
+        for (int i = 0; i < noviProizvodi.size(); i++) {
+            for (int j = 0; j < _transakcije.size(); j++) {
+                Kupovina* staraKupovina = dynamic_cast<Kupovina*>(_transakcije[j]);
+                if (staraKupovina != nullptr) {
+                    const vector<Proizvod>& stariProizvodi = staraKupovina->GetProizvodi();
+                    for (int k = 0; k < stariProizvodi.size(); k++) {
+                        if (noviProizvodi[i] == stariProizvodi[k])
+                            return false; // ovaj kupac je već kupio taj proizvod
+                    }
+                }
+            }
+        }
+        _transakcije.push_back(new Kupovina(*kupovina));
+        return true;
+    }
 
-	bool operator==(const Kupac& obj) {
-		if (strcmp(_sifra, obj._sifra) != 0)
-			return false;
-		return true;
-	}
-};
+    // 3) Ako je povrat, provjeri da li je proizvod ranije kupljen od ovog kupca
+    if (povrat != nullptr) {
+        const vector<Proizvod>& povratProizvodi = povrat->GetProizvodi();
+        for (int i = 0; i < povratProizvodi.size(); i++) {
+            bool kupljenKodIstogKupca = false;
+            for (int j = 0; j < _transakcije.size(); j++) {
+                Kupovina* staraKupovina = dynamic_cast<Kupovina*>(_transakcije[j]);
+                if (staraKupovina != nullptr) {
+                    const vector<Proizvod>& stariProizvodi = staraKupovina->GetProizvodi();
+                    for (int k = 0; k < stariProizvodi.size(); k++) {
+                        if (povratProizvodi[i] == stariProizvodi[k])
+                            kupljenKodIstogKupca = true;
+                    }
+                }
+            }
+            if (!kupljenKodIstogKupca)
+                return false; // ovaj kupac pokušava vratiti nešto što on sam nije kupio
+        }
+        _transakcije.push_back(new Povrat(*povrat));
+        return true;
+    }
+
+    return false;
+}
+
 int Kupac::_id = 1;
 
 class Prodavnica {

@@ -519,16 +519,17 @@ public:
 	_kupci.push_back(k);
 }
 
-	bool RegistrujTransakcijuKupcu(const char* sifra, Transakcija& transakcija) {
-		for (size_t i = 0; i < _kupci.size(); i++)
+bool RegistrujTransakcijuKupcu(const char* sifra, Kupovina k) {
+	for (int i = 0; i < _kupci.size(); i++)
+	{
+		if (strcmp(sifra, _kupci.at(i).GetSifra())==0)
 		{
-			if (strcmp(_kupci[i].GetSifra(), sifra) == 0) {
-				_kupci[i].DodajTransakciju(transakcija);
-				return true;
-			}
+			_kupci.at(i).DodajTransakciju(k);
+			return true;
 		}
-		return false;
 	}
+	return false;
+}
 
 	KolekcijaParova<Kupac, int, 50> PotrosnjaPoKategoriji(Kategorija kategorija) {
 		KolekcijaParova<Kupac, int, 50> rezultat;

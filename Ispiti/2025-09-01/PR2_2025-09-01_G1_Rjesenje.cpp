@@ -520,67 +520,9 @@ public:
 }
 
 	bool RegistrujTransakcijuKupcu(const char* sifra, Transakcija& nova) {
-
 		for (int i = 0; i < _kupci.size(); i++) {
 			if (strcmp(sifra, _kupci[i].GetSifra()) == 0) {
-				Kupac& kup = _kupci[i];
-
-				Kupovina* novaKupovina = dynamic_cast<Kupovina*>(&nova);
-				Povrat* noviPovrat = dynamic_cast<Povrat*>(&nova);
-				{
-					vector<Transakcija*>& trans = kup.GetTransakcije();
-					for (int t = 0; t < trans.size(); t++) {
-						if (nova.GetVrijemeRealizacije() == trans[t]->GetVrijemeRealizacije()) {
-							if ((novaKupovina != nullptr && dynamic_cast<Kupovina*>(trans[t]) != nullptr) ||
-								(noviPovrat != nullptr && dynamic_cast<Povrat*>(trans[t]) != nullptr)) {
-								return false;
-							}
-						}
-					}
-				}
-				if (novaKupovina != nullptr) {
-					const vector<Proizvod>& noviProizvodi = novaKupovina->GetProizvodi();
-					vector<Transakcija*>& trans = kup.GetTransakcije();
-
-					for (int np = 0; np < noviProizvodi.size(); np++) {
-						for (int t = 0; t < trans.size(); t++) {
-							Kupovina* staraKup = dynamic_cast<Kupovina*>(trans[t]);
-							if (staraKup != nullptr) {
-								const vector<Proizvod>& stari = staraKup->GetProizvodi();
-								for (int sp = 0; sp < stari.size(); sp++) {
-									if (noviProizvodi[np] == stari[sp]) {
-										return false; 
-									}
-								}
-							}
-						}
-					}
-				}
-				if (noviPovrat != nullptr) {
-					const vector<Proizvod>& povratProizvodi = noviPovrat->GetProizvodi();
-					vector<Transakcija*>& trans = kup.GetTransakcije();
-
-					for (int np = 0; np < povratProizvodi.size(); np++) {
-						bool kupljenKodIstogKupca = false;
-						for (int t = 0; t < trans.size(); t++) {
-							Kupovina* staraKup = dynamic_cast<Kupovina*>(trans[t]);
-							if (staraKup != nullptr) {
-								const vector<Proizvod>& stari = staraKup->GetProizvodi();
-								for (int sp = 0; sp < stari.size(); sp++) {
-									if (povratProizvodi[np] == stari[sp]) {
-										kupljenKodIstogKupca = true;
-										break;
-									}
-								}
-								if (kupljenKodIstogKupca) break;
-							}
-						}
-						if (!kupljenKodIstogKupca) {
-							return false; 
-						}
-					}
-				}
-				return kup.DodajTransakciju(nova);
+				return _kupci[i].DodajTransakciju(nova);
 			}
 		}
 		return false;

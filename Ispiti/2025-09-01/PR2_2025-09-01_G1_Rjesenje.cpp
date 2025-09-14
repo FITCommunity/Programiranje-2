@@ -5,6 +5,7 @@
 #include <ctime>
 #include <regex>
 #include <fstream>
+#include <iomanip>
 using namespace std;
 char* AlocirajTekst(const char* tekst) {
 	if (!tekst) return nullptr;
@@ -265,7 +266,11 @@ public:
 		return true;
 	}
 };
-
+string Formatiraj(int broj, int width = 2) {
+	ostringstream ss;
+	ss << setw(width) << setfill('0') << broj;
+	return ss.str();
+}
 class Transakcija {
 protected:
 	DatumVrijeme _vrijemeRealizacije;
@@ -318,9 +323,10 @@ public:
 	//05.10.2025 09:30:00 KUPLJENO 1 PROIZVODA U UKUPNOM IZNOSU OD 1500KM
 	string Info() const {
 		ostringstream info;
-		info << _vrijemeRealizacije.getDan() << "." << _vrijemeRealizacije.getMjesec() << "." << _vrijemeRealizacije.getGodina();
-		info << " " << _vrijemeRealizacije.getSati() << ":" << _vrijemeRealizacije.getMinute() << ":" << _vrijemeRealizacije.getSekunde();
-		info << " KUPLJENO " << _kupljeniProizvodi.size() << " PROIZVODA U UKUPNOM IZNOSU OD " << _iznos << "KM\n";
+		info << Formatiraj(_vrijemeRealizacije.GetDan()) << "." << Formatiraj(_vrijemeRealizacije.GetMjesec()) << "." << _vrijemeRealizacije.GetGodina() << " " <<
+			Formatiraj(_vrijemeRealizacije.GetSat()) << ":" << Formatiraj(_vrijemeRealizacije.GetMinuta()) << ":" << Formatiraj(_vrijemeRealizacije.GetSekunda()) <<
+			" KUPLJENO " << _kupljeniProizvodi.size() << " PROIZVODA U UKUPNOM IZNOSU OD " << _iznos << "KM";
+
 		return info.str();
 	}
 	const vector<Proizvod>& GetProizvodi() const { return _kupljeniProizvodi; }
@@ -357,9 +363,10 @@ public:
 	//05.10.2025 10:15 : 00 VRACENO 1 PROIZVODA U UKUPNOM IZNOSU OD 55KM
 	string Info() const {
 		ostringstream info;
-		info << _vrijemeRealizacije.getDan() << "." << _vrijemeRealizacije.getMjesec() << "." << _vrijemeRealizacije.getGodina();
-		info << " " << _vrijemeRealizacije.getSati() << ":" << _vrijemeRealizacije.getMinute() << ":" << _vrijemeRealizacije.getSekunde();
-		info << " VRACENO " << _vraceniProizvodi.size() << " PROIZVODA U UKUPNOM IZNOSU OD " << _iznos << "KM\n";
+		info << Formatiraj(_vrijemeRealizacije.GetDan()) << "." << Formatiraj(_vrijemeRealizacije.GetMjesec()) << "." << _vrijemeRealizacije.GetGodina() << " " <<
+			Formatiraj(_vrijemeRealizacije.GetSat()) << ":" << Formatiraj(_vrijemeRealizacije.GetMinuta()) << ":" << Formatiraj(_vrijemeRealizacije.GetSekunda()) <<
+			" VRACENO " << _vraceniProizvodi.size() << " PROIZVODA U UKUPNOM IZNOSU OD " << _iznos << "KM";
+
 		return info.str();
 	}
 	void DodajProizvod(const Proizvod& proizvod) {

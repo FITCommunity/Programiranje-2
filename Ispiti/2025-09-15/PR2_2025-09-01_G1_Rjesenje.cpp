@@ -513,9 +513,9 @@ public:
 		return *this;
 	}
 
-	bool DaLiTransakcijaSaIstimVremenomPostoji(Transakcija* transakcijaZaDodat) {
+	bool DaLiTransakcijaSaIstimVremenomPostoji(const Transakcija& transakcijaZaDodat) {
 		for (auto* transakcija : _transakcije) {
-			if (transakcija->GetVrijemeRealizacije() == transakcijaZaDodat->GetVrijemeRealizacije()) {
+			if (transakcija->GetVrijemeRealizacije() == transakcijaZaDodat.GetVrijemeRealizacije()) {
 				return true;
 			}
 		}
@@ -552,7 +552,7 @@ public:
 	}
 
 	bool DodajTransakciju(Kupovina kupovinaZaDodat) {
-		if (DaLiTransakcijaSaIstimVremenomPostoji(&kupovinaZaDodat)
+		if (DaLiTransakcijaSaIstimVremenomPostoji(kupovinaZaDodat)
 			|| DaLiKupovinaZaDodatImaPostojeciArtikal(kupovinaZaDodat)) {
 			return false;
 		}

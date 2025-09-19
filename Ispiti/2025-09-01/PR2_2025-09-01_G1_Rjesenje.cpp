@@ -323,8 +323,8 @@ public:
 	//05.10.2025 09:30:00 KUPLJENO 1 PROIZVODA U UKUPNOM IZNOSU OD 1500KM
 	string Info() const {
 		ostringstream info;
-		info << Formatiraj(_vrijemeRealizacije.GetDan()) << "." << Formatiraj(_vrijemeRealizacije.GetMjesec()) << "." << _vrijemeRealizacije.GetGodina() << " " <<
-			Formatiraj(_vrijemeRealizacije.GetSat()) << ":" << Formatiraj(_vrijemeRealizacije.GetMinuta()) << ":" << Formatiraj(_vrijemeRealizacije.GetSekunda()) <<
+		info << Formatiraj(_vrijemeRealizacije.getDan()) << "." << Formatiraj(_vrijemeRealizacije.getMjesec()) << "." << _vrijemeRealizacije.getGodina() << " " <<
+			Formatiraj(_vrijemeRealizacije.getSati()) << ":" << Formatiraj(_vrijemeRealizacije.getMinute()) << ":" << Formatiraj(_vrijemeRealizacije.getSekunde()) <<
 			" KUPLJENO " << _kupljeniProizvodi.size() << " PROIZVODA U UKUPNOM IZNOSU OD " << _iznos << "KM";
 
 		return info.str();
@@ -363,8 +363,8 @@ public:
 	//05.10.2025 10:15 : 00 VRACENO 1 PROIZVODA U UKUPNOM IZNOSU OD 55KM
 	string Info() const {
 		ostringstream info;
-		info << Formatiraj(_vrijemeRealizacije.GetDan()) << "." << Formatiraj(_vrijemeRealizacije.GetMjesec()) << "." << _vrijemeRealizacije.GetGodina() << " " <<
-			Formatiraj(_vrijemeRealizacije.GetSat()) << ":" << Formatiraj(_vrijemeRealizacije.GetMinuta()) << ":" << Formatiraj(_vrijemeRealizacije.GetSekunda()) <<
+		info << Formatiraj(_vrijemeRealizacije.getDan()) << "." << Formatiraj(_vrijemeRealizacije.getMjesec()) << "." << _vrijemeRealizacije.getGodina() << " " <<
+			Formatiraj(_vrijemeRealizacije.getSati()) << ":" << Formatiraj(_vrijemeRealizacije.getMinute()) << ":" << Formatiraj(_vrijemeRealizacije.getSekunde()) <<
 			" VRACENO " << _vraceniProizvodi.size() << " PROIZVODA U UKUPNOM IZNOSU OD " << _iznos << "KM";
 
 		return info.str();
@@ -445,11 +445,19 @@ public:
 		Kupovina* kupovina = dynamic_cast<Kupovina*>(&transakcija);
 		Povrat* povrat = dynamic_cast<Povrat*>(&transakcija);
 		bool zastavicaPovrat = false;
-		for (size_t i = 0; i < _transakcije.size(); i++)
-		{
-			//1. Provjera istog vremena za transakcije
-			if (transakcija.GetVrijemeRealizacije() == _transakcije[i]->GetVrijemeRealizacije())
-				return false;
+		if (kupovina) {
+			/*
+				Receno mi je da za metodu DodajTransakciju recenica
+				"oneomguciti dupliranje transakcija sa istim vremenom,"
+				Se odnosi cisto na Kupovine, ne radi se isto sa Povratima.
+				Ovo mi je rekao kolega jedan, jer je pitao profesora tokom ispita.
+			*/
+			for (size_t i = 0; i < _transakcije.size(); i++)
+			{
+				//1. Provjera istog vremena za transakcije
+				if (transakcija.GetVrijemeRealizacije() == _transakcije[i]->GetVrijemeRealizacije())
+					return false;
+			}
 		}
 		for (size_t j = 0; j < _transakcije.size(); j++)
 		{
@@ -516,15 +524,15 @@ public:
 	vector<Kupac>& GetKupci() { return _kupci; }
 
 	void DodajKupca(Kupac k) {
-	for (int i = 0; i < _kupci.size(); i++)
-	{
-		if (strcmp(_kupci.at(i).GetImePrezime(), k.GetImePrezime() )==0)
+		for (int i = 0; i < _kupci.size(); i++)
 		{
-			throw exception("Kupac je vec dodan");
+			if (strcmp(_kupci.at(i).GetImePrezime(), k.GetImePrezime()) == 0)
+			{
+				throw exception("Kupac je vec dodan");
+			}
 		}
+		_kupci.push_back(k);
 	}
-	_kupci.push_back(k);
-}
 
 	bool RegistrujTransakcijuKupcu(const char* sifra, Transakcija& nova) {
 		for (int i = 0; i < _kupci.size(); i++) {
@@ -583,9 +591,9 @@ bool UcitajPodatke(const string& putanja, vector<Prodavnica>& prodavnice) {
 	string nazivKupca;
 	string nazivProdavnice;
 
-	while (getline(fajl, nazivKupca, '|') 
+	while (getline(fajl, nazivKupca, '|')
 		&& getline(fajl, nazivProdavnice)) {
-		
+
 		Prodavnica* trenutnaProdavnica = nullptr;
 
 		for (Prodavnica& prodavnica : prodavnice) {
@@ -601,7 +609,7 @@ bool UcitajPodatke(const string& putanja, vector<Prodavnica>& prodavnice) {
 		}
 
 		bool daLiKupacPostoji = false;
-		
+
 		for (Kupac kupac : trenutnaProdavnica->GetKupci()) {
 			if (kupac.GetImePrezime() == nazivKupca) {
 				daLiKupacPostoji = true;
@@ -802,7 +810,7 @@ int main() {
 	if (UcitajPodatke(nazivFajla, prodavnice)) cout << "Ucitavanje uspjesno" << crt;
 
 	for (auto& prodavnica : prodavnice)
-		cout<< prodavnica.GetNaziv()<<" sa " << prodavnica.GetKupci().size() << " kupaca" << crt;
+		cout << prodavnica.GetNaziv() << " sa " << prodavnica.GetKupci().size() << " kupaca" << crt;
 
 	//vraca listu svih kupaca iz prodavnice koji su imali najmanje jednu transakciju u proslijedjenoj kategoriji,
 	//te koliko su ukupno potrosili na proizvode iz te kategorije 

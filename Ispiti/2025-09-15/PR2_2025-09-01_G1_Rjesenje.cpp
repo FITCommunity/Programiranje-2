@@ -402,16 +402,6 @@ public:
 		return false;
 	}
 
-	bool DaLiPostojiArtikalUKategoriji(Kategorija kategorija) {
-		for (auto& kupljeniArtikal : _kupljeniArtikli) {
-			if (kupljeniArtikal.GetKategorija() == kategorija) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	int GetIznosForKategorija(Kategorija kategorija) const {
 		int iznosForKategorija = 0;
 
@@ -452,16 +442,6 @@ public:
 		buffer << " ARTIKALA U UKUPNOM IZNOSU OD " << _iznos << "KM";
 
 		return buffer.str();
-	}
-
-	bool DaLiPostojiArtikalUKategoriji(Kategorija kategorija) {
-		for (auto& vraceniArtikal : _vraceniArtikli) {
-			if (vraceniArtikal.GetKategorija() == kategorija) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	int GetIznosForKategorija(Kategorija kategorija) const {
@@ -706,10 +686,10 @@ public:
 				Kupovina* kupovina = dynamic_cast<Kupovina*>(transakcija);
 				Povrat* povrat = dynamic_cast<Povrat*>(transakcija);
 
-				if (kupovina && kupovina->DaLiPostojiArtikalUKategoriji(kategorija)) {
+				if (kupovina) {
 					ukupnaPotrosnjaZaKupca += kupovina->GetIznosForKategorija(kategorija);
 				}
-				else if (povrat && povrat->DaLiPostojiArtikalUKategoriji(kategorija)) {
+				else if (povrat) {
 					ukupnaPotrosnjaZaKupca -= povrat->GetIznosForKategorija(kategorija);
 				}
 			}

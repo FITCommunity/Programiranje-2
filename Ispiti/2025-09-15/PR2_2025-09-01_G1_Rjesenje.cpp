@@ -349,8 +349,7 @@ protected:
 	int _iznos;
 public:
 	Transakcija(DatumVrijeme vrijemeRealizacije, int iznos = 0)
-		: _vrijemeRealizacije(vrijemeRealizacije), _iznos(iznos) {
-	}
+		: _vrijemeRealizacije(vrijemeRealizacije), _iznos(iznos) {}
 	virtual ~Transakcija() {}
 	virtual string Info() const = 0;
 	const DatumVrijeme& GetVrijemeRealizacije() const {
@@ -367,8 +366,7 @@ class Kupovina : public Transakcija {
 	vector<Artikal> _kupljeniArtikli;
 public:
 	Kupovina(DatumVrijeme vrijemeRealizacije) :
-		Transakcija(vrijemeRealizacije, 0) {
-	}
+		Transakcija(vrijemeRealizacije, 0) {}
 	const vector<Artikal>& GetArtikli() const {
 		return
 			_kupljeniArtikli;
@@ -413,13 +411,24 @@ public:
 
 		return false;
 	}
+
+	int GetIznosForKategorija(Kategorija kategorija) const {
+		int iznosForKategorija = 0;
+
+		for (const auto& kupljeniArtikal : _kupljeniArtikli) {
+			if (kupljeniArtikal.GetKategorija() == kategorija) {
+				iznosForKategorija += kupljeniArtikal.GetCijena();
+			}
+		}
+
+		return iznosForKategorija;
+	}
 };
 class Povrat : public Transakcija {
 	vector<Artikal> _vraceniArtikli;
 public:
 	Povrat(DatumVrijeme vrijemeRealizacije) :
-		Transakcija(vrijemeRealizacije, 0) {
-	}
+		Transakcija(vrijemeRealizacije, 0) {}
 	const vector<Artikal>& GetArtikli() const {
 		return
 			_vraceniArtikli;
@@ -453,6 +462,18 @@ public:
 		}
 
 		return false;
+	}
+
+	int GetIznosForKategorija(Kategorija kategorija) const {
+		int iznosForKategorija = 0;
+
+		for (const auto& vraceniArtikal : _vraceniArtikli) {
+			if (vraceniArtikal.GetKategorija() == kategorija) {
+				iznosForKategorija += vraceniArtikal.GetCijena();
+			}
+		}
+
+		return iznosForKategorija;
 	}
 };
 class Kupac {
@@ -686,10 +707,10 @@ public:
 				Povrat* povrat = dynamic_cast<Povrat*>(transakcija);
 
 				if (kupovina && kupovina->DaLiPostojiArtikalUKategoriji(kategorija)) {
-					ukupnaPotrosnjaZaKupca += kupovina->GetIznos();
+					ukupnaPotrosnjaZaKupca += kupovina->GetIznosForKategorija(kategorija);
 				}
 				else if (povrat && povrat->DaLiPostojiArtikalUKategoriji(kategorija)) {
-					ukupnaPotrosnjaZaKupca -= povrat->GetIznos();
+					ukupnaPotrosnjaZaKupca -= povrat->GetIznosForKategorija(kategorija);
 				}
 			}
 
